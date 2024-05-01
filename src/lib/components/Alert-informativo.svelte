@@ -1,0 +1,86 @@
+<script lang="ts">
+  export let message: any
+  export let btnSolicitud: boolean
+  export let theme: boolean
+</script>
+
+<div
+  class="flex flex-col w-full p-5 mt-5 container__alert"
+  style="box-shadow: 10px 12px 25px 0px #959BBC26;"
+>
+  <div class="flex w-full">
+    <div class=" w-[10%] h-[50px] border-r border-gray-300 mr-3">
+      <svg
+        class="container__icono"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <g clip-path="url(#clip0_2067_3660)">
+          <path
+            d="M10.525 14.2652L8.075 11.8152C7.925 11.6652 7.74167 11.5902 7.525 11.5902C7.30833 11.5902 7.11667 11.6736 6.95 11.8402C6.78333 12.0069 6.7 12.1986 6.7 12.4152C6.7 12.6319 6.78333 12.8152 6.95 12.9652L10 16.0152C10.15 16.1652 10.325 16.2402 10.525 16.2402C10.725 16.2402 10.9 16.1652 11.05 16.0152L17.05 10.0152C17.2 9.86523 17.2708 9.6819 17.2625 9.46523C17.2542 9.24857 17.175 9.06523 17.025 8.91523C16.875 8.74857 16.6875 8.66523 16.4625 8.66523C16.2375 8.66523 16.0417 8.74857 15.875 8.91523L10.525 14.2652ZM12 21.9902C10.5833 21.9902 9.26667 21.7361 8.05 21.2277C6.83333 20.7194 5.775 20.0152 4.875 19.1152C3.975 18.2152 3.27083 17.1569 2.7625 15.9402C2.25417 14.7236 2 13.4069 2 11.9902C2 10.5902 2.25417 9.2819 2.7625 8.06523C3.27083 6.84857 3.975 5.79023 4.875 4.89023C5.775 3.99023 6.83333 3.2819 8.05 2.76523C9.26667 2.24857 10.5833 1.99023 12 1.99023C13.4 1.99023 14.7083 2.24857 15.925 2.76523C17.1417 3.2819 18.2 3.99023 19.1 4.89023C20 5.79023 20.7083 6.84857 21.225 8.06523C21.7417 9.2819 22 10.5902 22 11.9902C22 13.4069 21.7417 14.7236 21.225 15.9402C20.7083 17.1569 20 18.2152 19.1 19.1152C18.2 20.0152 17.1417 20.7194 15.925 21.2277C14.7083 21.7361 13.4 21.9902 12 21.9902ZM12 20.4902C14.4167 20.4902 16.4375 19.6777 18.0625 18.0527C19.6875 16.4277 20.5 14.4069 20.5 11.9902C20.5 9.57357 19.6875 7.55273 18.0625 5.92773C16.4375 4.30273 14.4167 3.49023 12 3.49023C9.58333 3.49023 7.5625 4.30273 5.9375 5.92773C4.3125 7.55273 3.5 9.57357 3.5 11.9902C3.5 14.4069 4.3125 16.4277 5.9375 18.0527C7.5625 19.6777 9.58333 20.4902 12 20.4902Z"
+            fill="#FF461E"
+          />
+          <circle cx="12" cy="11.9902" r="12" fill="#FF461E" />
+          <path
+            d="M12.0019 4.49023C12.4034 4.49023 12.7466 4.63321 13.0313 4.91917C13.316 5.20512 13.4584 5.54887 13.4584 5.95042C13.4584 6.35196 13.3154 6.6951 13.0294 6.97982C12.7435 7.26454 12.3997 7.4069 11.9982 7.4069C11.5966 7.4069 11.2535 7.26392 10.9688 6.97796C10.6841 6.69202 10.5417 6.34827 10.5417 5.94671C10.5417 5.54517 10.6847 5.20204 10.9706 4.91732C11.2566 4.6326 11.6003 4.49023 12.0019 4.49023ZM13.4584 9.49023L13.4584 19.4902H10.5417L10.5417 9.49023H13.4584Z"
+            fill="white"
+          />
+        </g>
+        <defs>
+          <clipPath id="clip0_2067_3660">
+            <rect
+              width="24"
+              height="24"
+              fill="white"
+              transform="translate(0 -0.00976562)"
+            />
+          </clipPath>
+        </defs>
+      </svg>
+    </div>
+    <div class="flex flex-col w-full h-full">
+      <p class="font-bold text-base leading-[20px] tracking-[0px] ${theme ? 'text-white' : ''}">
+        Recuerda que...
+      </p>
+      <p class="text-base leading-[20px] tracking-[0em font-normal rounded-lg ${theme ? 'text-secundary-text' : ''}">
+        {#if Array.isArray(message)}
+          {message[0]}
+          <br />
+          <br />
+        {:else}
+          {message}
+        {/if}
+      </p>
+    </div>
+  </div>
+</div>
+<!-- Linea Azul  -->
+<div class="flex w-full container__linea__azul">
+  <div
+    style="width: 100%; height: 5px; background-image: linear-gradient(to right, #FF461E 30%, #eddeda 20%, #eddeda 100%);
+  background-size: 100% 4px;
+  background-repeat: no-repeat;"
+  ></div>
+</div>
+
+<style>
+  @media screen and (max-width: 768px) {
+    .container__alert {
+      margin-left: 10px;
+      margin-right: 10px;
+      margin-top: 30px;
+    }
+
+    .container__alert .container__icono {
+      margin-right: 10px;
+    }
+
+    .container__linea__azul {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+  }
+</style>
