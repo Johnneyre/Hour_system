@@ -19,7 +19,6 @@
 
 	export let data: PageData;
 	export let form: ActionData;
-	console.log(data);
 
 	let newData: any;
 	let store: any;

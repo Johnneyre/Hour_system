@@ -1,25 +1,41 @@
 import { type Handle } from '@sveltejs/kit';
-import { sequence } from '@sveltejs/kit/hooks';
 import { redirect } from '@sveltejs/kit';
 import fastAxios from '$lib/server/axios.js';
 
-const getUser: Handle = async ({ event, resolve }) => {
-	  console.log(event)
-	return resolve(event);
+const getUser = async (token: string): Promise<null> => {
+	try {
+		const response = await fastAxios.get('/users/me', {
+			headers: {
+				Authorization: `Bearer ${token}`
+			}
+		});
+		if (response.status === 200) {
+			return response.data;
+		}
+	} catch (error) {
+		console.log(error);
+	}
+	return null;
 };
 
-const middleware: Handle = async ({ event, resolve }) => {
-	// const unlogguedRoute = ['/login', '/', '/#'].some((x) => x == event.url.pathname);
-	  console.log(event)
+export const handle: Handle = async ({ event, resolve }) => {
+	const token = event.cookies.get('authToken');
+	const unloggedRoute = ['/login', '/', '/#'].some((x) => x == event.url.pathname);
 
-	// if (!unlogguedRoute && !event.locals.user) {
-	// 	throw redirect(303, '/login');
-	// }
+	if (event.url.pathname === '/' && !token) {
+		redirect(303, '/login');
+	}
 
-	// if (unlogguedRoute && event.locals.user) {
-	// 	throw redirect(303, '/u');
-	// }
-	return await resolve(event);
+	if (unloggedRoute && token) {
+		redirect(303, '/u');
+	}
+
+	if (token) {
+		const userInfo = await getUser(token);
+		console.log(userInfo);
+		event.locals.user = userInfo;
+	}
+
+	const response = await resolve(event);
+	return response;
 };
-
-export const handle = sequence(getUser, middleware);

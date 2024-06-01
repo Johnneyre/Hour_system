@@ -1,4 +1,5 @@
-export const load = async () => {
+export const load = async (event) => {
+	console.log(event.locals.user)
 	const banners = [
 		{
 			id: 11,

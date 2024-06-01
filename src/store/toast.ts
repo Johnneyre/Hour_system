@@ -34,7 +34,7 @@ function createToast() {
     time: function timer() {
       let time = setInterval(() => {
         toast.close(time)
-      }, 4000)
+      }, 2000)
 
       return time
     }

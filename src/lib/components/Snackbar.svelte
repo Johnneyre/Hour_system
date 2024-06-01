@@ -6,20 +6,20 @@
   $: info = {
     red: {
       bubble: "cross",
-      bg: "bg-white",
-      color: "rgb(153 27 27)",
+      bg: "bg-black",
+      color: "rgb(255 255 255)",
       title: "Algo salio mal",
     },
     green: {
       bubble: "check",
       color: "rgb(22 101 52)",
-      bg: "bg-white",
+      bg: "bg-black",
       title: "Excelente",
     },
     purple: {
       bubble: "Exclamation",
       color: "rgb(107 33 168)",
-      bg: "bg-white",
+      bg: "bg-black",
       title: "Notificación",
     },
   }[$toast.type];
@@ -31,13 +31,13 @@
 
 {#if $toast.open}
   <div class="flex justify-center transition-all">
-    <dialog class={"top-8 z-50 bg-transparent block fixed"} transition:slide>
+    <dialog class={"top-8 z-50 bg-transparent fixed flex justify-center"} transition:slide>
       <section
-        class={"md:w-[500px] h-20 flex items-center justify-start gap-2 shadow-md px-6 rounded-2xl " +
+        class={"w-[90%] xs:w-full h-20 flex items-center justify-start gap-2 shadow-md px-6 rounded-2xl " +
           info?.bg}
         class:info={info?.bg}
       >
-        <div>
+        <div class="text-white flex text-center">
           {#if $toast?.type == "purple"}
             <span
               class="flex items-center justify-center w-12 h-9 bg-purple-600 rounded-full"
@@ -46,7 +46,7 @@
             </span>
           {:else if $toast.type == "red"}
             <span
-              class="flex items-center justify-center w-12 h-9 bg-red-600 rounded-full"
+              class="flex items-center justify-center w-12 h-9 bg-red-600 rounded-full text-white"
             >
               <!-- <Icon src={X} class="text-white w-6 h-6" /> -->
             </span>

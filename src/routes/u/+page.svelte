@@ -4,13 +4,10 @@
 	import MobileBottomTapBar from '$lib/components/mobile-bottom-tap-bar.svelte';
 
 	export let data: any;
-	console.log(data.banners);
-	console.log(data);
-
 	let hoursInContract = 180;
 	let totalHours = 0;
 
-	for (const item of data.dedications) {
+	for (const item of data?.dedications) {
 		totalHours += item.project_hours;
 	}
 </script>

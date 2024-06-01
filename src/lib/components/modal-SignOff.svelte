@@ -7,8 +7,8 @@
 	export let modalOpen;
 
 	const logOut = async () => {
-		await $page.data.supabase.auth.signOut();
 		modalOpen = false;
+		location.href = '/logout';
 		invalidateAll();
 	};
 </script>
@@ -22,9 +22,7 @@
 	>
 		<div class="flex flex-col items-center justify-center -mt-12">
 			<img src={SignOffImg} alt="icon-out" />
-			<b class="text-2xl text-white text-center font-bold leading-8 pt-5 pb-4">
-				Confirmación
-			</b>
+			<b class="text-2xl text-white text-center font-bold leading-8 pt-5 pb-4"> Confirmación </b>
 			<p class="text-center text-lg leading-6 px-10 text-[#ffffffd6]">
 				¿Estás seguro de cerrar sesión?
 			</p>

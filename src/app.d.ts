@@ -1,8 +1,18 @@
 import type { AxiosInstance } from 'axios';
 
 interface User {
-	id: string;
-	email: string;
+	username: string;
+	password: string;
+	fullName: string;
+	C_I: number;
+	bithdate: date;
+	position: string;
+	status: boolean;
+	id_rol: number;
+	id_user: number;
+	created_at: string;
+	hashed_password: string;
+	disabled: boolean;
 }
 
 interface Session {
@@ -12,17 +22,8 @@ interface Session {
 declare global {
 	declare namespace App {
 		interface Locals {
-			session: Session | null;
-			client: AxiosInstance;
 			user: User | null;
-			sbuser: User;
-			version: string;
-			getSession(): Promise<Session | null>;
-			userProfile: string;
-			userPermissions: Array<any>;
-		}
-		interface PageData {
-			session: Session | null;
+			token: string;
 		}
 	}
 }

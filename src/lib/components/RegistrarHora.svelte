@@ -99,9 +99,6 @@
 				toast.error(data.message);
 			} else {
 				toast.success('Tu registro de horas ha sido guardado con éxito.');
-				console.log(data);
-
-				console.log(date);
 
 				invalidateAll();
 				show = false;

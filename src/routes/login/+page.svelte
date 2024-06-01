@@ -3,11 +3,27 @@
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import Mail from '$lib/assets/mail.svg';
 	import Password from '$lib/assets/password.svg';
+	import { toast } from '../../store/toast';
+	import type { ActionData } from './$types';
 
-	const submitSocialLogin: SubmitFunction = async ({ action, cancel }) => {
-		console.log('Hola');
+	export let form: ActionData;
 
-		cancel();
+	let user = '';
+	let password = '';
+
+	$: if (form?.success && form?.message !== undefined) {
+		toast.error(form?.message);
+	}
+
+	const submitSocialLogin: SubmitFunction = async ({ formData, cancel }) => {
+		if (!user || !password) {
+			toast.error('Por favor, digite su usuario y contraseña');
+			return cancel();
+		}
+		formData.append('user', user);
+		formData.append('password', password);
+		user = '';
+		password = '';
 	};
 </script>
 
@@ -31,6 +47,7 @@
 					id="email-address-icon"
 					class="bg-gray-700 border border-gray-600 text-white placeholder-gray-400 text-sm focus:outline-gray-700 rounded-lg block w-full ps-11 p-2.5"
 					placeholder="ejemplo@ejemplo.com"
+					bind:value={user}
 				/>
 			</div>
 			<label
@@ -46,11 +63,14 @@
 					id="password-address-icon"
 					class="bg-gray-700 border border-gray-600 text-white placeholder-gray-400 text-sm focus:outline-gray-700 rounded-lg block w-full ps-11 p-2.5"
 					placeholder="*********"
+					bind:value={password}
 				/>
 			</div>
 			<div class="flex mt-6">
-				<button class="w-full text-white bg-red-800 p-2 rounded-md hover:bg-red-600 font-medium"
-					>Iniciar Sesión</button
+				<button
+					type="submit"
+					class="w-full text-white bg-red-800 p-2 rounded-md hover:bg-red-600 font-medium"
+					formaction="?/login">Iniciar Sesión</button
 				>
 			</div>
 		</form>
