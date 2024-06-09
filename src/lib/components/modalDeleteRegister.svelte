@@ -1,23 +1,21 @@
 <script lang="ts">
 	import SignOffImg from '$lib/assets/SignOffIcon.svg';
 	import ModalContorn from './modal-contorn.svelte';
-	import { enhance, type SubmitFunction } from '$app/forms';
+	import { enhance } from '$app/forms';
 	import { toast } from '../../store/toast';
 	import { invalidateAll } from '$app/navigation';
 	export let show: boolean;
 	export let report: any;
-	export let user: any;
 
 	let disabled = false;
 
-	const resolver: SubmitFunction = ({ data }) => {
+	const resolver = async ({ data }) => {
 		data.append('id', report.id.toString());
 		data.append('personal_id', report.personal_id.toString());
 
 		return async ({ result: { data, type } }: any) => {
 			disabled = false;
 			if (type == 'failure') {
-				// toast.error(data.message ?? "")
 				toast.error(
 					'Ha ocurrido un error al intentar registrar las horas. Por favor intente nuevamente.'
 				);

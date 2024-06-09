@@ -63,6 +63,8 @@
 		checkRegistros();
 	});
 
+	console.log(data.reports);
+
 	function checkRegistros() {
 		if (Array.isArray(data.reports)) {
 			filteredReports = data.reports.filter((report) =>
@@ -109,7 +111,6 @@
 		dayBlocked = false;
 	}
 
-	//toas fot delete hora
 	$: if (form?.type == 'delete') {
 		if (form?.success) {
 			toast.success('Tu registro de horas ha sido eliminado con éxito.');
@@ -119,19 +120,17 @@
 			);
 		}
 	}
-	// $: if (browser && data?.mes != meses[dayjs($store?.selected).format('M')]) {
-	//   goto(`?date=${dayjs($store?.selected).format('MM/DD/YYYY')}`, {
-	//     invalidateAll: true
-	//   })
+	$: if (browser && data?.mes != meses[dayjs($store?.selected).format('M')]) {
+		goto(`?date=${dayjs($store?.selected).format('MM/DD/YYYY')}`, {
+			invalidateAll: true
+		});
+	} else if (browser) {
+		goto(`?date=${dayjs($store?.selected).format('MM/DD/YYYY')}`);
+	}
 
-	// } else if (browser) {
-	// goto(`?date=${dayjs($store?.selected).format('MM/DD/YYYY')}`)
-	// }
+	let date = dayjs(data.date);
 
-	//set day to date form backend
-	// let date=dayjs(data.date)
-
-	// $:date=dayjs(($store?.selected))
+	$: date = dayjs($store?.selected);
 	let filteredReports: any = [];
 
 	$: if (Array.isArray(data.reports)) {
@@ -142,13 +141,7 @@
 </script>
 
 {#if $store?.selected}
-	<RegistrarHora
-		bind:show
-		bind:date={$store.selected}
-		projects={data.projects}
-		tasks={data.tasks}
-		reports={data.reports}
-	/>
+	<RegistrarHora bind:show bind:date={$store.selected} tasks={data.tasks} reports={data.reports} />
 {/if}
 
 <main class="flex flex-col w-full min-h-full overflow-x-hidden overflow-y-scroll">
@@ -185,11 +178,11 @@
 				bind:daysBlockedAvailable={data.daysBlockedAvailable}
 			/>
 
-			<section class="transition-all flex flex-col h-full bg-white {claseContenedor}">
+			<section class="transition-all flex flex-col h-full {claseContenedor}">
 				<div class="w-full">
 					<div class="flex flex-row flex-wrap justify-between items-center pb-3 md:mx-3">
 						<div class="flex items-center justify-between mr-auto w-full">
-							<p class="text-lg text-black-linktic ml-[16px] mt-[16px] mb-[16px]">
+							<p class="text-lg text-white ml-[16px] mt-[16px] mb-[16px]">
 								{dayjs($store?.selected).format('D [de] MMMM [de] YYYY')}
 							</p>
 							{#if filteredReports.length > 0}
@@ -247,7 +240,7 @@
 							>
 								{#each filteredReports as report}
 									<CardsRegister bind:report bind:showEm bind:dayBlocked />
-									{#if showEm == report.id.toString()}
+									{#if showEm == report.id_hours.toString()}
 										<EditarHora
 											{isDateBlocked}
 											bind:dayBlocked
@@ -268,7 +261,7 @@
 								<div
 									class="flex flex-row flex-wrap justify-between items-center md:mx-3 overflow-aut"
 								>
-									<AlertInformativo message={messageAlertInfoCreateSoli} btnSolicitud={true} theme={false}/>
+									<AlertInformativo message={messageAlertInfoCreateSoli} />
 								</div>
 							{/if}
 						{/if}
@@ -276,7 +269,7 @@
 						{#if dayjs($store?.selected).isBefore(dayjs()) && dayjs($store?.selected).isAfter(dayjs('2022-07-01')) && !isDateBlocked($store?.selected)}
 							<div class="flex flex-col items-center w-full">
 								{#if filteredReports.length === 0}
-									<p class="text-center text-[#6E6E78] mt-5 mr-10 ml-10 mb-5">
+									<p class="text-center text-[#ffffffc1] mt-5 mr-10 ml-10 mb-5">
 										No has registrado actividades laboral en este día
 									</p>
 								{/if}
@@ -312,11 +305,7 @@
 								</button>
 							</div>
 						{:else if !showModal && !isDateBlocked($store?.selected)}
-							<AlertInformativo
-								message="Aún no puedes reportar actividades en este día"
-								btnSolicitud={false}
-                theme={true}
-							/>
+							<AlertInformativo message="Aún no puedes reportar actividades en este día" />
 						{/if}
 					</div>
 				</div>
@@ -327,7 +316,6 @@
 					? 'container__leyenda__movile_bloqueado'
 					: 'container__leyenda__movile'}"
 			>
-				<h2 class="text-sm text-dark-text">Leyenda</h2>
 				<div class="flex my-4 items-center w-full text-secundary-text">
 					<div class="text-xs flex flex-col m-[8px] gap-2 text-center items-center">
 						<p class="text-secundary-text text-sm inline-flex w-[30px] justify-center">1</p>
@@ -447,11 +435,7 @@
 							</span>
 						</button>
 					{:else if !showModal && !isDateBlocked($store?.selected)}
-						<AlertInformativo
-							message="Aún no puedes reportar actividades en este día"
-							btnSolicitud={false}
-              theme={true}
-						/>
+						<AlertInformativo message="Aún no puedes reportar actividades en este día" />
 					{/if}
 				</div>
 
@@ -459,7 +443,7 @@
 				<div class="flex flex-col">
 					{#each filteredReports as report}
 						<CardsRegister bind:report bind:showEm bind:dayBlocked />
-						{#if showEm == report.id.toString()}
+						{#if showEm == report.id_hours.toString()}
 							<EditarHora
 								{isDateBlocked}
 								bind:dayBlocked
@@ -477,7 +461,7 @@
 				{#if $store?.selected}
 					{#if showModal || isDateBlocked($store?.selected)}
 						<div class="flex flex-row flex-wrap justify-between items-center md:mx-3">
-							<AlertInformativo message={messageAlertInfoCreateSoli} btnSolicitud={true} theme={true}/>
+							<AlertInformativo message={messageAlertInfoCreateSoli} />
 						</div>
 					{/if}
 				{/if}
@@ -540,7 +524,7 @@
 			height: 350px;
 			border-top-left-radius: 8%;
 			border-top-right-radius: 8%;
-			background-color: #ffffff;
+			background-color: red;
 			border-bottom: 1px solid #dadcee;
 			box-shadow: 0px -10px 25px 0px #d2d2d433;
 			overflow: hidden;
@@ -554,7 +538,7 @@
 			height: 550px;
 			border-top-left-radius: 8%;
 			border-top-right-radius: 8%;
-			background-color: #ffffff;
+			background-color: red;
 			border-bottom: 1px solid #dadcee;
 			box-shadow: 0px -10px 25px 0px #d2d2d433;
 			z-index: 10;
@@ -565,11 +549,11 @@
 			position: absolute;
 			bottom: 165px;
 			height: 190px;
+			color: #fff;
 			border-top-left-radius: 8%;
 			border-top-right-radius: 8%;
-			background-color: #ffffff;
+			background-color: #1e1f20;
 			border-bottom: 1px solid #dadcee;
-			box-shadow: 0px -10px 25px 0px #d2d2d433;
 			overflow: hidden;
 			z-index: 1;
 		}

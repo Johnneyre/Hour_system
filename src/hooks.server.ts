@@ -32,7 +32,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	if (token) {
 		const userInfo = await getUser(token);
-		console.log(userInfo);
 		event.locals.user = userInfo;
 	}
 

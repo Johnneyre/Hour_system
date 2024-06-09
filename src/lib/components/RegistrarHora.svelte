@@ -1,13 +1,11 @@
 <script lang="ts">
 	import IconDown from '$lib/assets/icon-down.svg';
-	import MagnifyingGlass from '$lib/assets/icon-glass.svg';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from '../../store/toast';
 	import dayjs from 'dayjs';
 	import { slide } from 'svelte/transition';
-	import { ArrowLeft, Icon } from 'svelte-hero-icons';
 	import 'dayjs/plugin/utc';
 	import 'dayjs/plugin/timezone';
 	import Modal from '$lib/components/modal-limiteHoras.svelte';
@@ -16,15 +14,12 @@
 	export let date: dayjs.Dayjs;
 	export let show = false;
 	export let showModal = false;
-	export let projects: any[];
 	export let tasks: any[];
 	export let reports: any[];
 
 	$: totalhours = addedTasks.reduce((prev, curr) => prev + (curr.hours || 0), 0);
 
-	let fullNameProject = '';
-	let selected: any | null;
-	let notes: string;
+	let description: string;
 	let disabled = false;
 	let openSelect = false;
 	let addedTasks: any[] = [];
@@ -53,18 +48,13 @@
 		}
 	};
 
-	const handleSubmit: SubmitFunction = async ({ data, cancel }) => {
-		if (!selected) {
-			toast.error('Seleccione un proyecto de la lista');
-			return cancel();
-		}
-
+	const handleSubmit: SubmitFunction = async ({ formData, cancel }) => {
 		if (!addedTasks || !addedTasks.length) {
 			toast.error('Seleccione al menos una tarea');
 			return cancel();
 		}
 
-		if (!notes) {
+		if (!description) {
 			toast.error('No puedes continuar sin llenar el campo requerido');
 			return cancel();
 		}
@@ -79,16 +69,15 @@
 			return cancel();
 		}
 
-		data.append('date', dayjs(date).format('YYYY-MM-DD'));
-		data.append('project_id', selected.id.toString());
-		data.append('hours', totalhours.toString());
-		data.append('reports', JSON.stringify(reports));
-		data.append('currentMonth', JSON.stringify(currentMonth));
-		data.append('hoursPerMonth', JSON.stringify(hoursPerMonth));
-		data.append('totalhours', JSON.stringify(totalhours));
+		formData.append('date', dayjs(date).format('YYYY-MM-DD'));
+		formData.append('hours', totalhours.toString());
+		formData.append('reports', JSON.stringify(reports));
+		formData.append('currentMonth', JSON.stringify(currentMonth));
+		formData.append('hoursPerMonth', JSON.stringify(hoursPerMonth));
+		formData.append('totalhours', JSON.stringify(totalhours));
 
 		for (const task of addedTasks) {
-			data.append('tasks', JSON.stringify(task));
+			formData.append('tasks', JSON.stringify(task));
 		}
 
 		disabled = true;
@@ -128,32 +117,6 @@
 			</div>
 
 			<form action="?/create" use:enhance={handleSubmit} method="post" class="pt-5">
-				<label for="project" class="text-md text-secundary-text px-2">Ingresa el proyecto</label>
-				<div class="relative pb-5">
-					<input
-						list={'name'}
-						id="project-input"
-						type="text"
-						class="w-full rounded-md border mt-1 bg-secundary-background h-14 text-lg pl-4 pr-12 placeholder-gray-400"
-						placeholder="Insertar"
-						bind:value={fullNameProject}
-						on:focus={() => (fullNameProject = '')}
-						required
-						autocomplete="off"
-					/>
-					<datalist id={'name'}>
-						{#each projects as project}
-							<option value={project.name} />
-						{/each}
-					</datalist>
-
-					<div
-						class="absolute inset-y-0 flex items-center right-1 pr-2 pb-3 pointer-events-none bg-secundary-background h-8 top-6"
-					>
-						<img src={MagnifyingGlass} alt="glass" />
-					</div>
-				</div>
-
 				<label for="horas" class="text-md text-secundary-text px-2">Selecciona las tareas</label>
 				<div class="relative pb-3" bind:this={container}>
 					<!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -184,7 +147,7 @@
 										type="checkbox"
 										class="w-6 h-6 rounded-md min-w-[1.5rem] min-h-[1.5rem]"
 										on:change={(e) => handleTareaCheck(e, task, i)}
-										checked={addedTasks.some((obj) => obj.id === task.id)}
+										checked={addedTasks.some((obj) => obj.id === task.id_tasks)}
 									/>
 									<p>{task.name}</p>
 								</div>
@@ -226,9 +189,9 @@
 						Ingrese breve descripción de las tareas ejecutadas<span class="text-red-600">*</span>
 					</label>
 					<textarea
-						name="notes"
-						bind:value={notes}
-						class="w-auto h-12 border-gray-300 border resize-none bg-secundary-background rounded-lg py-2 px-4 text-lg"
+						name="description"
+						bind:value={description}
+						class="w-auto h-12 border-gray-300 border resize-none bg-secundary-background text-white rounded-lg py-2 px-4 text-lg"
 						placeholder="Inserte"
 						maxlength="100"
 						minlength="10"
@@ -236,7 +199,7 @@
 					/>
 				</div>
 
-				<div class="flex flex-row items-center justify-center w-full pt-4 pb-4">
+				<div class="flex flex-row items-center justify-center w-full pt-12 pb-1">
 					<button
 						on:click|preventDefault={() => (show = !show)}
 						class="w-1/2 text-red-betel text-lg font-semibold hover:text-white transition duration-1000"

@@ -1,12 +1,9 @@
 <script lang="ts">
   export let message: any
-  export let btnSolicitud: boolean
-  export let theme: boolean
 </script>
 
 <div
   class="flex flex-col w-full p-5 mt-5 container__alert"
-  style="box-shadow: 10px 12px 25px 0px #959BBC26;"
 >
   <div class="flex w-full">
     <div class=" w-[10%] h-[50px] border-r border-gray-300 mr-3">
@@ -42,10 +39,10 @@
       </svg>
     </div>
     <div class="flex flex-col w-full h-full">
-      <p class="font-bold text-base leading-[20px] tracking-[0px] ${theme ? 'text-white' : ''}">
+      <p class="font-bold text-base leading-[20px] tracking-[0px] text-white">
         Recuerda que...
       </p>
-      <p class="text-base leading-[20px] tracking-[0em font-normal rounded-lg ${theme ? 'text-secundary-text' : ''}">
+      <p class="text-base leading-[20px] tracking-[0em font-normal rounded-lg text-secundary-text">
         {#if Array.isArray(message)}
           {message[0]}
           <br />

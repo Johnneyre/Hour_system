@@ -25,5 +25,8 @@ declare global {
 			user: User | null;
 			token: string;
 		}
+		interface PageData {
+			user: User | null;
+		}
 	}
 }

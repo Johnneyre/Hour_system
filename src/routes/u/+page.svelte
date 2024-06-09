@@ -2,8 +2,9 @@
 	import Banner from '$lib/components/home/banner-home.svelte';
 	import CardsHome from '$lib/components/home/cards-home.svelte';
 	import MobileBottomTapBar from '$lib/components/mobile-bottom-tap-bar.svelte';
+	import type { PageData } from './$types';
 
-	export let data: any;
+	export let data: PageData;
 	let hoursInContract = 180;
 	let totalHours = 0;
 
@@ -24,7 +25,7 @@
 			<section class="flex items-center flex-col lg:flex-row justify-between w-full">
 				<div class="w-full lg:w-1/3 pt-4 pb-8">
 					<h1 class="text-2xl font-bold text-dark-text">
-						Hola, {'Juanito Alimaña'}
+						Hola, {data.user?.fullName}
 					</h1>
 					<p class="text-lg text-dark-text pt-2">No olvides registrar tu jornada laboral.</p>
 					<div class="flex items-center justify-start pt-4">
@@ -76,12 +77,12 @@
 	}
 
 	progress::-webkit-progress-value {
-		background-color: #FF461E;
+		background-color: #ff461e;
 		border-radius: 10px;
 	}
 
 	progress::-moz-progress-bar {
-		background-color: #FF461E;
+		background-color: #ff461e;
 		border-radius: 10px;
 	}
 </style>
