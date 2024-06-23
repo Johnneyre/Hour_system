@@ -236,10 +236,13 @@
 						<!--INSERTAR CARDS-->
 						{#if filteredReports.length > 0}
 							<div
-								class="flex flex-col overflow-auto mb-[20px] h-[180px] container__cards_register"
+								class="flex mb-[20px] h-[110px] container__cards_register w-full {filteredReports.length >
+								1
+									? 'flex-wrap'
+									: ''} {filteredReports.length > 2 ? 'overflow-auto' : ''}"
 							>
 								{#each filteredReports as report}
-									<CardsRegister bind:report bind:showEm bind:dayBlocked />
+									<CardsRegister bind:report bind:showEm bind:dayBlocked widthMax maxLenght={filteredReports.length} />
 									{#if showEm == report.id_hours.toString()}
 										<EditarHora
 											{isDateBlocked}
@@ -318,7 +321,7 @@
 			>
 				<div class="flex my-4 items-center w-full text-secundary-text">
 					<div class="text-xs flex flex-col m-[8px] gap-2 text-center items-center">
-						<p class="text-secundary-text text-sm inline-flex w-[30px] justify-center">1</p>
+						<p class="text-secundary-text text-sm inline-flex w-[30px] justify-center"><s>1</s></p>
 						Día no hábil
 					</div>
 					<div class="text-xs flex flex-col m-[8px] gap-2 text-center items-center">
@@ -360,7 +363,7 @@
 				<h2 class="text-xl text-dark-text">Leyenda</h2>
 				<div class="grid grid-cols-2 my-4 gap-4 text-secundary-text">
 					<div>
-						<p class="text-secundary-text text-xl inline-flex w-10 justify-center">1</p>
+						<p class="text-secundary-text text-xl inline-flex w-10 justify-center"><s>1</s></p>
 						Día no hábil
 					</div>
 					<div class="flex">
@@ -507,11 +510,11 @@
 		.container__dia__seleccionado__extendido {
 			width: 100%;
 			position: absolute;
-			bottom: 200px;
-			height: 400px;
+			bottom: 10px;
+			height: 350px;
 			border-top-left-radius: 8%;
 			border-top-right-radius: 8%;
-			background-color: #ffffff;
+			background-color: #000000d6;
 			border-bottom: 1px solid #dadcee;
 			box-shadow: 0px -10px 25px 0px #d2d2d433;
 			z-index: 10;
@@ -521,24 +524,23 @@
 			width: 100%;
 			position: absolute;
 			bottom: 200px;
-			height: 350px;
+			height: 400px;
 			border-top-left-radius: 8%;
 			border-top-right-radius: 8%;
-			background-color: red;
+			background-color: #000000d6;
 			border-bottom: 1px solid #dadcee;
 			box-shadow: 0px -10px 25px 0px #d2d2d433;
-			overflow: hidden;
-			z-index: 1;
+			z-index: 10;
 		}
 
 		.container__dia__seleccionado__extendido__bloqueado {
 			width: 100%;
 			position: absolute;
-			bottom: 200px;
+			bottom: 0px;
 			height: 550px;
 			border-top-left-radius: 8%;
 			border-top-right-radius: 8%;
-			background-color: red;
+			background-color: #000000d6;
 			border-bottom: 1px solid #dadcee;
 			box-shadow: 0px -10px 25px 0px #d2d2d433;
 			z-index: 10;

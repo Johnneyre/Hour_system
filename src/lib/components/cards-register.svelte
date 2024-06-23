@@ -5,8 +5,16 @@
 
 	export let report: any;
 	export let dayBlocked: boolean;
+	export let widthMax: boolean = false;
+	export let maxLenght = 1
 
-  console.log(report)
+	let activeClass = false
+
+	if (widthMax && maxLenght > 1) {
+		activeClass = true
+	}
+
+	console.log(report);
 
 	let showDm = false;
 	export let showEm;
@@ -17,15 +25,17 @@
 	<ModalDeleteRegister bind:show={showDm} {report} />
 {/if}
 
-<section class="flex flex-col justify-between items-center py-2 md:mx-0 w-auto container_register">
+<section
+	class="flex flex-col justify-between items-center py-2 md:mx-0 container_register {activeClass ? 'max-w-[46%]' : 'w-full'}"
+>
 	<div
-		class="card border border-border-cards rounded-2xl h-auto my-1 w-full mx-auto p-3 bg-card-gray container_card_register"
+		class="card border border-black rounded-2xl h-auto my-1 w-full mx-auto p-3 bg-red-betel container_card_register"
 	>
-		<h1 class="font-bold text-lg text-black-linktic">
+		<h1 class="font-bold text-lg text-blue-100">
 			{report.hours} horas
 		</h1>
 		<span class="flex flex-row items-center justify-start">
-			<p class="text-black-linktic text-base">
+			<p class="text-blue-100 text-base">
 				{report?.task?.name} - {report?.task?.description}
 			</p>
 			<div class="flex flex-col lg:flex-row justify-center pl-3 lg:px-0 items-center ml-auto">
@@ -53,13 +63,8 @@
 <style>
 	@media screen and (max-width: 768px) {
 		.container_register {
-			margin-left: 15px;
-			margin-right: 15px;
-		}
-
-		.container_register .container_card_register {
-			background-color: #ffffff;
-			border: 1px solid #dadcee;
+			margin-left: 10px;
+			margin-right: 10px;
 		}
 	}
 </style>
