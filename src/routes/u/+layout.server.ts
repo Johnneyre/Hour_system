@@ -5,6 +5,4 @@ export const load = async (event) => {
 	if (!token) {
 		redirect(302, '/login');
 	}
-
-	console.log(event.locals.user)
 };
