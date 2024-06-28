@@ -2,8 +2,12 @@
   import Aside from '$lib/components/aside.svelte'
   import Footer from '$lib/components/footer.svelte'
   import ModalSignOff from '$lib/components/modal-SignOff.svelte'
+	import type { PageData } from './$types.js';
 
-  // export let data
+  export let data: PageData;
+
+  console.log(data)
+  
   let modalOpen = false
 </script>
 
@@ -13,7 +17,10 @@
   />
   <slot />
 </section>
-<Footer bind:modalOpen/>
+<Footer 
+bind:modalOpen
+user={data?.user}
+/>
 
 {#if modalOpen}
   <ModalSignOff bind:modalOpen />
