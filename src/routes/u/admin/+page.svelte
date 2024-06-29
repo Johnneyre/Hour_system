@@ -31,10 +31,10 @@
 	}
 
 	async function handleDelete() {
-
 		await new Promise((resolve) => setTimeout(resolve, 0));
 		openModalDelete = false;
 	}
+
 	async function submitDelete({ formData }: any) {
 		if (modalDeleteType == 'tarea') {
 			console.log('Eliminar tarea');
@@ -46,6 +46,28 @@
 			console.log(idDelete);
 			formData.append('deleteType', String(modalDeleteType));
 			formData.append('deleteId', String(idDelete));
+		}
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		openModalDelete = false;
+	}
+
+	async function submitCreate({ formData }: any) {
+		if (modalDeleteType == 'tarea') {
+			console.log('Crear tarea');
+			formData.append('createType', String(modalDeleteType));
+			let taskName = String(formData.get('Nombre de la tarea'));
+			let taskDescription = String(formData.get('descripcion'));
+		} else {
+			console.log('Crear usuario');
+			formData.append('createType', String(modalDeleteType));
+			let username = String(formData.get('username'));
+			let password = String(formData.get('password'));
+			let fullName = String(formData.get('fullName'));
+			let C_I = String(formData.get('C_I'));
+			let bithdate = String(formData.get('bithdate'));
+			let id_rol = String(formData.get('id_rol'));
+
+			console.log(username, password, fullName, C_I, bithdate, id_rol);
 		}
 		await new Promise((resolve) => setTimeout(resolve, 0));
 		openModalDelete = false;
@@ -77,6 +99,7 @@
 					<span class="expanded">
 						<button
 							on:click={() => {
+								modalDeleteType = 'usuario';
 								openModalUser = true;
 							}}
 							type="button"
@@ -137,6 +160,7 @@
 					<span class="expanded">
 						<button
 							on:click={() => {
+								modalDeleteType = 'tarea';
 								openModalTarea = true;
 							}}
 							type="button"
@@ -175,92 +199,175 @@
 			{/each}
 		</details>
 	</div>
+
+	<!-- Reporte de horas -->
+	<div class="w-full bg-[#1e1f20] mb-5 rounded-2xl mt-3 p-4">
+		<h1 class="text-3xl font-bold text-white mb-6">Reporte de horas</h1>
+		<p class="sm:text-lg text-white">Usuario</p>
+		<select
+			class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+			placeholder="usuario"
+			name="usuario"
+		>
+			<option disabled selected hidden value="">Selecione un Usuario</option>
+			{#each data.Users as user}
+				<option value={user.id_user}>{user.fullName}</option>
+			{/each}
+		</select>
+		<div class="flex justify-between">
+			<div class="w-[45%]">
+				<p class="sm:text-lg text-white">Fecha de inicio</p>
+				<input
+					type="date"
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Fecha de inicio"
+					name="fechaInicio"
+				/>
+			</div>
+			<div class="w-[45%]">
+				<p class="sm:text-lg text-white">Fecha final</p>
+				<input
+					type="date"
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Fecha final"
+					name="fechaFinal"
+				/>
+			</div>
+		</div>
+
+		<div class="p-3 flex justify-between bg-[#131314] rounded-2xl">
+			<div class=" flex flex-col text-white bg-[#1e1f20] p-5 rounded-2xl w-[31%] items-center justify-center">
+				<p>Juanito Alimaña</p>
+			</div>
+			<div class="flex flex-col text-white bg-[#1e1f20] p-5 rounded-2xl w-[31%] items-center justify-center text-center">
+				<p class="font-bold">40</p>
+				<p class="text-sm">Horas totales</p>
+			</div>
+			<div class="flex flex-col text-white bg-[#1e1f20] p-5 rounded-2xl w-[31%] items-center justify-center text-center">
+				<p class="font-bold">18</p>
+				<p class="text-sm">Tareas totales</p>
+			</div>
+		</div>
+	</div>
 </div>
 
 <!-- Modal Usuario -->
 <Portal>
 	<ModalLarge bind:open={openModalUser}>
-		<div class="flex flex-col justify-center">
-			<p class="text-2xl text-white text-center font-bold leading-8 pt-6 pb-4">
-				Creacion de Usuario
-			</p>
-		</div>
+		<form method="post" use:enhance={(e) => submitCreate(e)}>
+			<div class="flex flex-col justify-center">
+				<p class="text-2xl text-white text-center font-bold leading-8 pt-6 pb-4">
+					Creacion de Usuario
+				</p>
+			</div>
 
-		<div class="w-full px-4">
-			<p class="sm:text-lg text-white">Nombre del usuario</p>
-			<input
-				class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mb-4"
-				placeholder="Nombre del usuario"
-				name="Nombre del usuario"
-			/>
-			<p class="sm:text-lg text-white">Rol del usuario</p>
-			<select
-				class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md"
-				placeholder="Rol del usuario"
-				name="Rol del usuario"
-			>
-				<option disabled selected hidden value="">Selecione un rol</option>
-				{#each data.Task as task}
-					<option value={task.id_tasks}>{task.name}</option>
-				{/each}
-			</select>
-		</div>
-
-		<div class="flex my-6 pt-4 justify-around">
-			<button
-				class="text-center h-14 rounded-md text-white font-semibold"
-				on:click={() => (openModalUser = false)}
-			>
-				Cancelar
-			</button>
-			<form method="post">
+			<div class="w-full px-4">
+				<p class="sm:text-lg text-white">Nombre de usuario</p>
+				<input
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Nombre de usuario"
+					name="username"
+				/>
+				<p class="sm:text-lg text-white">Contraseña</p>
+				<input
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Contraseña"
+					name="password"
+				/>
+				<p class="sm:text-lg text-white">Nombre y apellido</p>
+				<input
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Nombre y apellido"
+					name="fullName"
+				/>
+				<p class="sm:text-lg text-white">Número de cedula</p>
+				<input
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Número de cedula"
+					name="C_I"
+				/>
+				<p class="sm:text-lg text-white">Fecha de nacimiento</p>
+				<input
+					type="date"
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Fecha de nacimiento"
+					name="bithdate"
+				/>
+				<p class="sm:text-lg text-white">Nombre y apellido</p>
+				<select
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Rol del usuario"
+					name="Rol del usuario"
+				>
+					<option disabled selected hidden value="">Selecione un rol</option>
+					{#each data.Task as task}
+						<option value={task.id_tasks}>{task.name}</option>
+					{/each}
+				</select>
+			</div>
+			<!-- </form> -->
+			<div class="flex my-6 pt-4 justify-around">
+				<button
+					class="text-center h-14 rounded-md text-white font-semibold"
+					on:click|self={() => (openModalTarea = false)}
+				>
+					Cancelar
+				</button>
+				<!-- <form method="post" use:enhance={(e) => submitCreate(e)}> -->
 				<button
 					type="submit"
-					formaction="?/delete"
+					formaction="?/create"
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
-					on:click={handleCreateUser}
+					on:click={submitCreate}
 				>
 					Crear
 				</button>
-			</form>
-		</div>
+			</div>
+		</form>
 	</ModalLarge>
 </Portal>
 
 <!-- Modal Tarea -->
 <Portal>
 	<ModalLarge bind:open={openModalTarea}>
-		<div class="flex flex-col justify-center">
-			<p class="text-2xl text-white text-center font-bold leading-8 pt-6 pb-4">Crear Tarea</p>
-		</div>
+		<form method="post" use:enhance={(e) => submitCreate(e)}>
+			<div class="flex flex-col justify-center">
+				<p class="text-2xl text-white text-center font-bold leading-8 pt-6 pb-4">Crear Tarea</p>
+			</div>
 
-		<div class="w-full px-4">
-			<p class="sm:text-lg text-white">Nombre de la tarea</p>
-			<input
-				class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md"
-				placeholder="Nombre del usuario"
-				name="Nombre de la tarea"
-			/>
-		</div>
+			<div class="w-full px-4">
+				<p class="sm:text-lg text-white">Nombre de la tarea</p>
+				<input
+					class="inline sm:text-lg mr-auto mb-4 mt-1 w-full bg-stone-300 pl-3 rounded-md"
+					placeholder="Nombre del usuario"
+					name="Nombre de la tarea"
+				/>
 
-		<div class="flex my-6 pt-4 justify-around">
-			<button
-				class="text-center h-14 rounded-md text-white font-semibold"
-				on:click={() => (openModalTarea = false)}
-			>
-				Cancelar
-			</button>
-			<form method="post">
+				<p class="sm:text-lg text-white">Descripción</p>
+				<input
+					class="inline sm:text-lg mr-auto mb-4 mt-1 w-full bg-stone-300 pl-3 rounded-md"
+					placeholder="Descripción"
+					name="descripcion"
+				/>
+			</div>
+
+			<div class="flex my-6 pt-4 justify-around">
+				<button
+					class="text-center h-14 rounded-md text-white font-semibold"
+					on:click|self={() => (openModalTarea = false)}
+				>
+					Cancelar
+				</button>
 				<button
 					type="submit"
-					formaction="?/delete"
+					formaction="?/create"
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
 					on:click={handleCreateTarea}
 				>
 					Crear
 				</button>
-			</form>
-		</div>
+			</div>
+		</form>
 	</ModalLarge>
 </Portal>
 
@@ -283,7 +390,7 @@
 		<div class="flex my-6 pt-4 justify-around">
 			<button
 				class="text-center h-14 rounded-md text-white font-semibold"
-				on:click={() => (openModalDelete = false)}
+				on:click|self={() => (openModalDelete = false)}
 			>
 				Cancelar
 			</button>
