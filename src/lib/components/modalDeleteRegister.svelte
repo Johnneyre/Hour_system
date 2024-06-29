@@ -4,14 +4,15 @@
 	import { enhance } from '$app/forms';
 	import { toast } from '../../store/toast';
 	import { invalidateAll } from '$app/navigation';
+	import type { SubmitFunction } from '@sveltejs/kit';
 	export let show: boolean;
 	export let report: any;
 
 	let disabled = false;
 
-	const resolver = async ({ data }) => {
-		data.append('id', report.id.toString());
-		data.append('personal_id', report.personal_id.toString());
+	const resolver: SubmitFunction = async ({ formData }) => {
+		console.log(report)
+		formData.append('id', report.id_hours);
 
 		return async ({ result: { data, type } }: any) => {
 			disabled = false;

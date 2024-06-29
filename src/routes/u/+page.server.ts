@@ -1,7 +1,6 @@
 import fastAxios from '$lib/server/axios.js';
 
 export const load = async (event) => {
-	console.log(event.locals.user);
 
 	const [responseHours] = await Promise.all([
 		fastAxios.get(`/hours/by-user/${event.locals.user?.id_user}`)

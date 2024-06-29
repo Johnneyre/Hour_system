@@ -12,10 +12,9 @@
 >
 	<img src={IconPerson} alt="cards" />
 	<p class="pt-2 text-dark-text">
-		<!-- {dedication?.project_cost_center} - {dedication?.project_name} -->
-		{tasks[0].task.name} - {tasks[0].task.description}
+		{tasks[0]?.task.name} - {tasks[0]?.task.description}
 	</p>
 	<h2 class="text-3xl font-bold text-dark-text">
-		{tasks[0].hours} Horas
+		{tasks[0]?.hours} Horas
 	</h2>
 </div>

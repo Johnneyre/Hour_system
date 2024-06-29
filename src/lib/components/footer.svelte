@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { Clock, Folder, Home, Icon, UserCircle } from 'svelte-hero-icons';
-	import HourGrayIcon from '$lib/assets/aside/hour-gray.svg';
 	import { page } from '$app/stores';
 
-	console.log($page.data.user?.id_rol)
-
 	export let modalOpen = false;
+	export let user;
 
-	const canRegisterHours = true;
-	const canLimitHours = true;
+	let canRegisterHours = true;
+	let canLimitHours = false;
+
+	if (user.id_rol === 1) {
+		canLimitHours = true;
+		canRegisterHours = false
+	}
 </script>
 
 <footer class="md:hidden fixed bottom-0 w-full bg-secundary-background z-[80]">
@@ -23,7 +26,7 @@
 			</a>
 		{/if}
 
-		{#if $page.data.user?.id_rol == 1}
+		{#if canLimitHours}
 			<a href="/u/admin" class:active={$page.url.pathname.includes('admin')}>
 				<span class="flex flex-row gap-4 m-auto items-center">
 					<Icon class="text-gray-texts w-6" src={Folder} alt="icon-home" />

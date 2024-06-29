@@ -8,7 +8,7 @@
 	let hoursInContract = 180;
 	let totalHours = 15;
 
-	console.log(data.tasks)
+	console.log(data?.tasks)
 
 	// for (const item of data?.dedications) {
 	// 	totalHours += item.project_hours;
@@ -39,7 +39,7 @@
 					</div>
 				</div>
 			</section>
-			{#if data.dedications.length > 0}
+			{#if data?.dedications?.length > 0}
 				<div class="mr-auto w-full">
 					<div
 						class="pt-12 flex flex-wrap justify-center md:justify-between pb-5 text-center lg:text-left font-bold text-dark-text"
@@ -55,8 +55,8 @@
 					<div
 						class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-auto gap-5"
 					>
-						{#each data.dedications as dedication}
-							<CardsHome bind:dedication tasks={data.tasks} />
+						{#each data?.dedications as dedication}
+							<CardsHome bind:dedication tasks={data?.tasks} />
 						{/each}
 					</div>
 				</div>
