@@ -249,7 +249,6 @@
 											bind:dayBlocked
 											bind:show={showEm}
 											bind:report
-											projects={data?.projects}
 											tasks={data.tasks}
 											reports={data?.reports}
 											user={data?.user}
@@ -452,7 +451,6 @@
 								bind:dayBlocked
 								bind:show={showEm}
 								bind:report
-								projects={data?.projects}
 								tasks={data.tasks}
 								reports={data?.reports}
 								user={data?.user}

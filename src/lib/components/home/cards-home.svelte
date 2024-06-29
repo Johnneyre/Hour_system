@@ -1,6 +1,10 @@
 <script lang="ts">
 	import IconPerson from '$lib/assets/icono-person.svg';
 	export let dedication: any;
+	export let tasks: any;
+
+	console.log(dedication)
+	console.log(tasks[0])
 </script>
 
 <div
@@ -8,12 +12,10 @@
 >
 	<img src={IconPerson} alt="cards" />
 	<p class="pt-2 text-dark-text">
-		{dedication?.project_cost_center} - {dedication?.project_name}
+		<!-- {dedication?.project_cost_center} - {dedication?.project_name} -->
+		{tasks[0].task.name} - {tasks[0].task.description}
 	</p>
-	<h1 class="text-3xl font-bold text-dark-text">
-		{Math.round((dedication?.percentage_dedication + Number.EPSILON) * 100) / 100} %
-	</h1>
-	<h2 class="text-md font-semibold text-dark-text">
-		{dedication.project_hours} Horas
+	<h2 class="text-3xl font-bold text-dark-text">
+		{tasks[0].hours} Horas
 	</h2>
 </div>

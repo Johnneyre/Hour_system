@@ -1,23 +1,13 @@
+import fastAxios from '$lib/server/axios.js';
+
 export const load = async (event) => {
 	console.log(event.locals.user);
-	const banners = [
-		{
-			id: 11,
-			created_at: '2024-02-09T17:57:44.861018+00:00',
-			name: 'mainBannerWeb',
-			url: '"https://slighanusuaanmqcjpuu.supabase.co/storage/v1/object/public/banners/mainBannerWeb"',
-			link: '',
-			available: true
-		},
-		{
-			id: 12,
-			created_at: '2024-02-09T17:57:44.861018+00:00',
-			name: 'mainBannerMobile',
-			url: '"https://slighanusuaanmqcjpuu.supabase.co/storage/v1/object/public/banners/mainBannerMobile"',
-			link: '',
-			available: true
-		}
-	];
+
+	const [responseHours] = await Promise.all([
+		fastAxios.get(`/hours/by-user/${event.locals.user?.id_user}`)
+	]);
+
+	console.log(responseHours.data)
 
 	// const users = {
 	// 	id: 12,
@@ -89,13 +79,13 @@ export const load = async (event) => {
 			percentage_dedication: 80,
 			project_hours: 80
 		},
-		{
-			project_name: 'PROYECTO MINEGOS',
-			project_cost_center: '205',
-			percentage_dedication: 80,
-			project_hours: 80
-		}
+		// {
+		// 	project_name: 'PROYECTO MINEGOS',
+		// 	project_cost_center: '205',
+		// 	percentage_dedication: 80,
+		// 	project_hours: 80
+		// }
 	];
 
-	return { banners, dedications, user: event.locals.user };
+	return { dedications, user: event.locals.user, tasks: responseHours.data };
 };

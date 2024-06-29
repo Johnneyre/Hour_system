@@ -35,10 +35,8 @@
 		<section slot="modal-DeleteRegister" class="modal-signoff-content">
 			<div class="flex flex-col items-center justify-center -mt-12">
 				<img src={SignOffImg} alt="icon-out" />
-				<b class="text-2xl text-black-linktic text-center font-bold leading-8 pt-5 pb-4">
-					Confirmación
-				</b>
-				<p class="text-center text-lg max-w-xs leading-6 px-10 text-gray-texts">
+				<b class="text-2xl text-center font-bold leading-8 pt-5 pb-4 text-white"> Confirmación </b>
+				<p class="text-center text-lg max-w-xs leading-6 px-10 text-secundary-text">
 					¿Estás seguro que deseas eliminar este registro?
 				</p>
 			</div>
@@ -48,13 +46,14 @@
 					<button
 						{disabled}
 						type="submit"
-						class="block w-full bg-blue-linktic text-white font-semibold py-4 mb-8 rounded-xl hover:bg-blue-navy transition duration-1000"
+						class="block w-full bg-red-betel text-white font-semibold py-4 mb-8 rounded-xl hover:bg-[#8f4733] transition duration-1000"
 						>Continuar</button
 					>
 				</form>
 				<button
 					on:click={() => (show = !show)}
-					class="w-full text-blue-linktic text-lg font-semibold">Cancelar</button
+					class="w-full text-red-betel text-lg font-semibold hover:text-white transition duration-1000"
+					>Cancelar</button
 				>
 			</div>
 		</section>

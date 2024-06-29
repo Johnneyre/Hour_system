@@ -1,28 +1,12 @@
 <script lang="ts">
-	interface bannerInterface {
-		id: number;
-		name: string;
-		url: string;
-	}
+	import banner from '$lib/assets/banner.jpg';
 
-	export let banners: any;
-
-	let cacheBuster = '';
 	let mainBannerWebUrl: string;
 	let mainBannerMobileUrl: string;
 
-	$: mainBannerWebUrl =
-		JSON.parse(banners?.find((banner: bannerInterface) => banner.name === 'mainBannerWeb')?.url) ||
-		'URL not found';
-
-	$: mainBannerMobileUrl =
-		JSON.parse(
-			banners?.find((banner: bannerInterface) => banner.name === 'mainBannerMobile')?.url +
-				cacheBuster
-		) || 'URL not found';
-
-	$: linkMainBanner =
-		banners?.find((banner: bannerInterface) => banner.name === 'mainBannerWeb')?.link || '';
+	$: mainBannerWebUrl = banner;
+	$: mainBannerMobileUrl = banner;
+	$: linkMainBanner = banner;
 </script>
 
 <!--  BANNER DESKTOP-->
