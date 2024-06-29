@@ -6,18 +6,20 @@
 
 	export let data: PageData;
 	let hoursInContract = 180;
-	let totalHours = 0;
+	let totalHours = 15;
 
-	for (const item of data?.dedications) {
-		totalHours += item.project_hours;
-	}
+	console.log(data.tasks)
+
+	// for (const item of data?.dedications) {
+	// 	totalHours += item.project_hours;
+	// }
 </script>
 
 <svelte:window />
 
 <div class="flex flex-col w-full pb-20 md:pb-6">
 	<div class="mx-5 md:mx-10 mt-4">
-		<Banner banners={data.banners} />
+		<Banner />
 	</div>
 
 	<div class="px-5 sm:px-10 flex flex-col">
@@ -54,7 +56,7 @@
 						class="grid grid-cols-2 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 w-auto gap-5"
 					>
 						{#each data.dedications as dedication}
-							<CardsHome bind:dedication />
+							<CardsHome bind:dedication tasks={data.tasks} />
 						{/each}
 					</div>
 				</div>

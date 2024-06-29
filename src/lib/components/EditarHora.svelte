@@ -1,18 +1,15 @@
 <script lang="ts">
 	import IconDown from '$lib/assets/icon-down.svg';
-	import MagnifyingGlass from '$lib/assets/icon-glass.svg';
 	import type { SubmitFunction } from '@sveltejs/kit';
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from '../../store/toast';
-	import { ArrowLeft, Icon } from 'svelte-hero-icons';
 	import { slide } from 'svelte/transition';
 	import dayjs from 'dayjs';
 	import { writable } from 'svelte/store';
 
 	export let show: string;
 	export let report: any;
-	export let projects: any[];
 	export let tasks: any[];
 	export let user: any;
 	export let reports: any[];
@@ -23,8 +20,6 @@
 	let date: dayjs.Dayjs;
 
 	let currentReport = { ...report };
-
-	let fullNameProject = currentReport.project.cost_center + ' - ' + currentReport.project.name;
 
 	let disabled = false;
 
@@ -63,17 +58,6 @@
 			lastTask.set(tarea.name);
 		}
 	};
-
-	let errorBorder = 'border-gray-lines';
-
-	$: if (projects.find((p) => p.cost_center + ' - ' + p.name == fullNameProject)) {
-		errorBorder = 'border-green-600';
-		currentReport.project =
-			projects.find((p) => p.cost_center + ' - ' + p.name == fullNameProject) ??
-			currentReport.project;
-	} else {
-		errorBorder = 'border-red-600';
-	}
 
 	const handleSubmit: SubmitFunction = async ({ data, cancel }) => {
 		if (!currentReport.project) {
@@ -157,55 +141,29 @@
 <svelte:window on:click={onWindowClick} />
 
 <section
-	id={currentReport.id.toString()}
+	id={currentReport.id_hours.toString()}
 	class="w-screen overflow-y-scroll h-screen pt-4 pb-20 md:pt-4 md:pb-4 top-0 left-0 overflow-hidden fixed z-40"
 >
 	<div
-		class="shadow-xl mx-auto md:ml-[20%] border rounded-lg bg-white px-8 py-8 max-w-sm md:max-w-md <md:(w-4/5) block"
+		class="shadow-xl mx-auto md:ml-[20%] border rounded-lg border-red-betel bg-secundary-background px-8 py-8 max-w-sm md:max-w-md <md:(w-4/5) block"
 	>
 		<div class="flex flex-col items-center justify-center">
-			<h1 class="text-3xl font-semibold text-center text-black-linktic pb-2">Registro de horas</h1>
-			<p class="text-lg text-gray-texts text-center">
+			<h1 class="text-3xl font-semibold text-center text-dark-text pb-2">Registro de horas</h1>
+			<p class="text-lg text-secundary-text text-center">
 				Ingrese los datos solicitados para registrar su jornada laboral.
 			</p>
 		</div>
 
 		<form use:enhance={handleSubmit} method="post" action="?/update" class="pt-5">
-			<label for="project" class="text-md text-gray-texts px-2">Ingresa el proyecto</label>
-			<div class="relative pb-5">
-				<input
-					list={'name'}
-					id="project-input"
-					type="text"
-					class="w-full rounded-md border mt-1 h-14 text-lg shadow-sm pl-4 pr-12placeholder-gray-400 {errorBorder} outline-none"
-					placeholder="Insertar"
-					bind:value={fullNameProject}
-					on:focus={() => (fullNameProject = '')}
-					required
-					autocomplete="off"
-					disabled={dayBlocked}
-				/>
-				<datalist id={'name'}>
-					{#each projects as project}
-						<option value={project.cost_center + ' - ' + project.name} />
-					{/each}
-				</datalist>
-
-				<div
-					class="absolute inset-y-0 flex items-center right-1 pr-2 pb-3 pointer-events-none bg-white h-8 top-6"
-				>
-					<img src={MagnifyingGlass} alt="glass" />
-				</div>
-			</div>
-
-			<label for="horas" class="text-md text-gray-texts px-2">Selecciona las tareas</label>
+			<label for="horas" class="text-md text-secundary-text px-2">Selecciona las tareas</label>
 			<div class="relative pb-3" bind:this={container}>
+				<!-- svelte-ignore a11y-no-static-element-interactions -->
 				<div
 					class="w-full rounded-md border mt-1 border-gray-lines h-12 text-lg shadow-sm pl-4 pr-12 bg-no-repeat bg-right bg-contain appearance-none relative"
 					on:click={() => (openSelect = !openSelect)}
 					on:keydown={() => (openSelect = !openSelect)}
 				>
-					<p class="mt-2 block overflow-hidden text-ellipsis whitespace-nowrap">
+					<p class="mt-2 block overflow-hidden text-ellipsis whitespace-nowrap text-gray-400">
 						{$lastTask || 'Seleccione...'}
 					</p>
 					<span class="absolute right-0 top-0 mr-3 my-5 flex items-center justify-center">
@@ -218,7 +176,7 @@
 				</div>
 				{#if openSelect && !dayBlocked}
 					<div
-						class=" border mt-1 border-gray-lines bg-white w-full left-0 p-2 rounded-md overflow-y-auto h-32"
+						class="text-secundary-text border mt-1 border-gray-lines bg-secundary-background w-full left-0 p-2 rounded-md overflow-y-auto h-32"
 					>
 						{#each tasks as task, i}
 							<div class="flex items-center gap-4 mb-3" transition:slide>
@@ -237,7 +195,7 @@
 					</div>
 				{/if}
 			</div>
-			<div class="flex flex-wrap gap-2 pt-4 w-full">
+			<div class="flex flex-wrap gap-2 pt-4 w-full text-secundary-text">
 				{#each addedTasks as task}
 					<span class="flex items-center p-3.5 rounded-lg gap-4 w-full">
 						{#if task.id == 0}
@@ -253,11 +211,10 @@
 							max="23"
 							required
 							disabled={dayBlocked}
-							class="rounded-md border mt-1 border-gray-lines h-14 text-lg shadow-sm pl-4 placeholder-gray-400 w-32 min-w-[8rem]"
+							class="rounded-md border mt-1 border-gray-lines h-14 text-lg shadow-sm pl-4 text-black placeholder-gray-400 w-32 min-w-[8rem]"
 						/>
 
-						<button on:click|preventDefault={() => deleteTask(task)}>
-						</button>
+						<button on:click|preventDefault={() => deleteTask(task)}> </button>
 					</span>
 				{/each}
 				<span class="flex items-center p-3.5 rounded-lg gap-4 pr-10 justify-end w-full">
@@ -269,24 +226,27 @@
 			<hr class="bg-gray-lines mt-3" />
 
 			<div class="flex flex-col pt-5">
-				<label for="horas" class="text-md text-gray-texts px-2 pb-1"
+				<label for="horas" class="text-md text-secundary-text px-2 pb-1"
 					>Ingrese breve descripción de las tareas ejecutadas<span class="text-red-600">*</span
 					></label
 				>
 				<textarea
 					name="notes"
 					bind:value={currentReport.notes}
-					class="w-auto h-28 border-gray-300 border rounded-lg py-2 px-4 text-lg"
+					class="w-auto h-12 border-gray-300 border rounded-lg py-2 px-4 text-lg bg-secundary-background text-white"
 					placeholder="Inserte"
 					disabled={dayBlocked}
+					maxlength="100"
+					minlength="10"
+					required
 				/>
 			</div>
 
-			<div class="flex flex-row items-center justify-center w-full pt-4 pb-4">
+			<div class="flex flex-row items-center justify-center w-full pt-12 pb-1">
 				<button
 					{disabled}
 					on:click|preventDefault={() => (show = '')}
-					class="w-1/2 text-red-betel text-lg font-semibold"
+					class="w-1/2 text-red-betel text-lg font-semibold hover:text-white transition duration-1000"
 				>
 					Cancelar
 				</button>
@@ -294,14 +254,14 @@
 				{#if !dayBlocked}
 					<button
 						{disabled}
-						class="w-1/2 bg-red-betel text-white font-semibold py-4 rounded-xl hover:bg-blue-navy transition duration-1000"
+						class="w-1/2 bg-red-betel text-white font-semibold py-4 rounded-xl hover:bg-[#8f4733] transition duration-1000"
 					>
 						Continuar
 					</button>
 				{:else}
 					<button
 						disabled={dayBlocked}
-						class="w-1/2 bg-red-betel text-white font-semibold py-4 rounded-xl hover:bg-blue-navy transition duration-1000"
+						class="w-1/2 bg-red-betel text-white font-semibold py-4 rounded-xl hover:bg-[#8f4733] transition duration-1000"
 					>
 						Continuar
 					</button>
