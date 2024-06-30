@@ -1,14 +1,17 @@
 <script lang="ts">
-	import Banner from '$lib/components/home/banner-home.svelte';
-	import CardsHome from '$lib/components/home/cards-home.svelte';
 	import MobileBottomTapBar from '$lib/components/mobile-bottom-tap-bar.svelte';
 	import { ChevronDown, ChevronUp, Icon, Pencil, Plus, Trash } from 'svelte-hero-icons';
 	import ModalLarge from '$lib/components/ModalLarge.svelte';
 	import Portal from 'svelte-portal';
-	import type { PageData } from './$types';
+	import type { ActionData, PageData } from './$types';
 	import { enhance } from '$app/forms';
 
 	export let data: PageData;
+	export let form: ActionData;
+
+	let totalHours = 0;
+
+	$: form;
 
 	console.log(data);
 
@@ -16,35 +19,34 @@
 	let openModalTarea: boolean;
 	let openModalDelete: boolean;
 
+	let ShowHoursReport: boolean = false;
+
+	let selectedUser: string = '';
+	let userData: any;
+	let userN: any;
+
+	let fechaInicio: string = '';
+	let fechaFin: string = '';
+
+	let totalTasks: number = 0;
+
 	let modalDeleteType: string;
 
 	let idDelete: string;
 
-	async function handleCreateUser() {
-		// await new Promise((resolve) => setTimeout(resolve, 0));
-		openModalUser = false;
-	}
-
-	async function handleCreateTarea() {
-		// await new Promise((resolve) => setTimeout(resolve, 0));
-		openModalTarea = false;
-	}
-
-	async function handleDelete() {
-		await new Promise((resolve) => setTimeout(resolve, 0));
-		openModalDelete = false;
-	}
+	const formData = new FormData();
 
 	async function submitDelete({ formData }: any) {
 		if (modalDeleteType == 'tarea') {
 			console.log('Eliminar tarea');
 			console.log(idDelete);
-			formData.append('deleteType', String(modalDeleteType));
+			console.log(modalDeleteType);
+			formData.append('deleteType', modalDeleteType);
 			formData.append('deleteId', String(idDelete));
 		} else {
 			console.log('Eliminar usuario');
 			console.log(idDelete);
-			formData.append('deleteType', String(modalDeleteType));
+			formData.append('deleteType', modalDeleteType);
 			formData.append('deleteId', String(idDelete));
 		}
 		await new Promise((resolve) => setTimeout(resolve, 0));
@@ -52,25 +54,122 @@
 	}
 
 	async function submitCreate({ formData }: any) {
+		console.log(formData);
 		if (modalDeleteType == 'tarea') {
 			console.log('Crear tarea');
-			formData.append('createType', String(modalDeleteType));
+
 			let taskName = String(formData.get('Nombre de la tarea'));
 			let taskDescription = String(formData.get('descripcion'));
 		} else {
 			console.log('Crear usuario');
-			formData.append('createType', String(modalDeleteType));
 			let username = String(formData.get('username'));
 			let password = String(formData.get('password'));
 			let fullName = String(formData.get('fullName'));
 			let C_I = String(formData.get('C_I'));
 			let bithdate = String(formData.get('bithdate'));
-			let id_rol = String(formData.get('id_rol'));
+			let id_rol = String(formData.get('rol'));
 
 			console.log(username, password, fullName, C_I, bithdate, id_rol);
 		}
 		await new Promise((resolve) => setTimeout(resolve, 0));
 		openModalDelete = false;
+	}
+
+	async function GetHourAndTask() {
+		console.log('funciona');
+		const userData = data.Users.find((user: any) => user.id_user === selectedUser);
+		console.log(userData);
+		userN = userData ? userData.fullName : '';
+		console.log(userN);
+	}
+
+	async function clearInput() {
+		selectedUser = '';
+		fechaInicio = '';
+		fechaFin = '';
+		ShowHoursReport = false;
+	}
+
+	function formatFecha(fecha: any) {
+		console.log(fecha);
+		if (fecha) {
+			const fechaObjeto = new Date(fecha);
+			console.log(fechaObjeto);
+			console.log(fechaObjeto.toISOString());
+
+			return fechaObjeto.toISOString();
+		} else {
+			return '';
+		}
+	}
+
+	$: if (form?.hours) {
+		let fechaI = new Date();
+		let fechaF = new Date();
+		if (fechaInicio == '') {
+			fechaI = new Date('2024-06-01T00:00:00.000Z');
+		} else {
+			fechaI = new Date(formatFecha(fechaInicio));
+		}
+		if (fechaFin == '') {
+			let fechaActual = new Date().toISOString();
+		} else {
+			fechaF = new Date(formatFecha(fechaFin));
+		}
+
+		if (fechaInicio == '' && fechaFin == '') {
+			const filteredHours = form.hours.filter((hour: any) => {
+				const createdAtDate = new Date(hour.created_at);
+				console.log(createdAtDate);
+				return createdAtDate >= fechaI && createdAtDate <= fechaF;
+			});
+
+			console.log(form.hours);
+			const horas_lista = form.hours?.map((item: { hours: any }) => item.hours);
+
+			console.log(horas_lista);
+
+			// Calculamos la suma utilizando la función reduce()
+			totalHours = horas_lista?.reduce((acc: any, curr: any) => acc + curr, 0);
+
+			console.log(totalHours);
+
+			totalTasks = 0;
+			for (const item of form.hours) {
+				if (item.task) {
+					totalTasks++;
+				}
+			}
+			console.log(totalTasks);
+		} else {
+			const filteredHours = form.hours.filter((hour: any) => {
+				const createdAtDate = new Date(hour.created_at);
+				console.log(createdAtDate);
+				return createdAtDate >= fechaI && createdAtDate <= fechaF;
+			});
+
+			console.log(filteredHours);
+
+			console.log(form.hours);
+			const horas_lista = filteredHours.map((item: { hours: any }) => item.hours);
+
+			console.log(horas_lista);
+
+			// Calculamos la suma utilizando la función reduce()
+			totalHours = horas_lista?.reduce((acc: any, curr: any) => acc + curr, 0);
+
+			console.log(totalHours);
+
+			totalTasks = 0;
+			for (const item of filteredHours) {
+				if (item.task) {
+					totalTasks++;
+				}
+			}
+			console.log(totalTasks);
+		}
+
+		ShowHoursReport = true;
 	}
 </script>
 
@@ -202,52 +301,80 @@
 
 	<!-- Reporte de horas -->
 	<div class="w-full bg-[#1e1f20] mb-5 rounded-2xl mt-3 p-4">
-		<h1 class="text-3xl font-bold text-white mb-6">Reporte de horas</h1>
-		<p class="sm:text-lg text-white">Usuario</p>
-		<select
-			class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
-			placeholder="usuario"
-			name="usuario"
-		>
-			<option disabled selected hidden value="">Selecione un Usuario</option>
-			{#each data.Users as user}
-				<option value={user.id_user}>{user.fullName}</option>
-			{/each}
-		</select>
-		<div class="flex justify-between">
-			<div class="w-[45%]">
-				<p class="sm:text-lg text-white">Fecha de inicio</p>
-				<input
-					type="date"
-					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
-					placeholder="Fecha de inicio"
-					name="fechaInicio"
-				/>
+		<form method="post" use:enhance={() => GetHourAndTask()}>
+			<h1 class="text-3xl font-bold text-white mb-6">Reporte de horas</h1>
+			<p class="sm:text-lg text-white">Usuario</p>
+			<select
+				class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+				placeholder="usuario"
+				name="usuario"
+				bind:value={selectedUser}
+			>
+				<option disabled selected hidden value="">Selecione un Usuario</option>
+				{#each data.Users as user}
+					<option value={user.id_user}>{user.fullName}</option>
+				{/each}
+			</select>
+			<div class="flex justify-between">
+				<div class="w-[45%]">
+					<p class="sm:text-lg text-white">Fecha de inicio</p>
+					<input
+						type="date"
+						class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+						placeholder="Fecha de inicio"
+						name="fechaInicio"
+						bind:value={fechaInicio}
+					/>
+				</div>
+				<div class="w-[45%]">
+					<p class="sm:text-lg text-white">Fecha final</p>
+					<input
+						type="date"
+						class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+						placeholder="Fecha final"
+						name="fechaFinal"
+						bind:value={fechaFin}
+					/>
+				</div>
 			</div>
-			<div class="w-[45%]">
-				<p class="sm:text-lg text-white">Fecha final</p>
-				<input
-					type="date"
-					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
-					placeholder="Fecha final"
-					name="fechaFinal"
-				/>
+			<div class="flex justify-center mb-4">
+				<button
+					type="submit"
+					formaction="?/getReport"
+					class="rounded-[20px] bg-[#ff461e] h-8 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300 mx-auto"
+				>
+					Consultar
+				</button>
+				<button
+					type="button"
+					on:click={clearInput}
+					class="rounded-[20px] bg-[#ff461e] h-8 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300 mx-auto"
+				>
+					Limpiar
+				</button>
 			</div>
-		</div>
-
-		<div class="p-3 flex justify-between bg-[#131314] rounded-2xl">
-			<div class=" flex flex-col text-white bg-[#1e1f20] p-5 rounded-2xl w-[31%] items-center justify-center">
-				<p>Juanito Alimaña</p>
+		</form>
+		{#if ShowHoursReport}
+			<div class="p-3 flex justify-between bg-[#131314] rounded-2xl">
+				<div
+					class=" flex flex-col text-white bg-[#1e1f20] p-5 rounded-2xl w-[31%] items-center justify-center"
+				>
+					<p>{userN}</p>
+				</div>
+				<div
+					class="flex flex-col text-white bg-[#1e1f20] p-5 rounded-2xl w-[31%] items-center justify-center text-center"
+				>
+					<p class="font-bold">{totalHours}</p>
+					<p class="text-sm">Horas totales</p>
+				</div>
+				<div
+					class="flex flex-col text-white bg-[#1e1f20] p-5 rounded-2xl w-[31%] items-center justify-center text-center"
+				>
+					<p class="font-bold">{totalTasks}</p>
+					<p class="text-sm">Tareas totales</p>
+				</div>
 			</div>
-			<div class="flex flex-col text-white bg-[#1e1f20] p-5 rounded-2xl w-[31%] items-center justify-center text-center">
-				<p class="font-bold">40</p>
-				<p class="text-sm">Horas totales</p>
-			</div>
-			<div class="flex flex-col text-white bg-[#1e1f20] p-5 rounded-2xl w-[31%] items-center justify-center text-center">
-				<p class="font-bold">18</p>
-				<p class="text-sm">Tareas totales</p>
-			</div>
-		</div>
+		{/if}
 	</div>
 </div>
 
@@ -263,6 +390,7 @@
 
 			<div class="w-full px-4">
 				<p class="sm:text-lg text-white">Nombre de usuario</p>
+				<input type="hidden" value="usuario" name="typeCrear" />
 				<input
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Nombre de usuario"
@@ -293,30 +421,28 @@
 					placeholder="Fecha de nacimiento"
 					name="bithdate"
 				/>
-				<p class="sm:text-lg text-white">Nombre y apellido</p>
+				<p class="sm:text-lg text-white">Rol</p>
 				<select
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Rol del usuario"
-					name="Rol del usuario"
+					name="rol"
 				>
 					<option disabled selected hidden value="">Selecione un rol</option>
-					{#each data.Task as task}
-						<option value={task.id_tasks}>{task.name}</option>
-					{/each}
+					<option value="1">Administrador</option>
+					<option value="2">Usuario</option>
 				</select>
 			</div>
-			<!-- </form> -->
 			<div class="flex my-6 pt-4 justify-around">
 				<button
+					type="button"
 					class="text-center h-14 rounded-md text-white font-semibold"
-					on:click|self={() => (openModalTarea = false)}
+					on:click={() => (openModalUser = false)}
 				>
 					Cancelar
 				</button>
-				<!-- <form method="post" use:enhance={(e) => submitCreate(e)}> -->
 				<button
 					type="submit"
-					formaction="?/create"
+					formaction="?/createUser"
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
 					on:click={submitCreate}
 				>
@@ -337,6 +463,7 @@
 
 			<div class="w-full px-4">
 				<p class="sm:text-lg text-white">Nombre de la tarea</p>
+				<input type="hidden" value="tarea" name="typeCrear" />
 				<input
 					class="inline sm:text-lg mr-auto mb-4 mt-1 w-full bg-stone-300 pl-3 rounded-md"
 					placeholder="Nombre del usuario"
@@ -353,16 +480,17 @@
 
 			<div class="flex my-6 pt-4 justify-around">
 				<button
+					type="button"
 					class="text-center h-14 rounded-md text-white font-semibold"
-					on:click|self={() => (openModalTarea = false)}
+					on:click={() => (openModalTarea = false)}
 				>
 					Cancelar
 				</button>
 				<button
 					type="submit"
-					formaction="?/create"
+					formaction="?/createTask"
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
-					on:click={handleCreateTarea}
+					on:click={submitCreate}
 				>
 					Crear
 				</button>
@@ -389,8 +517,9 @@
 
 		<div class="flex my-6 pt-4 justify-around">
 			<button
+				type="button"
 				class="text-center h-14 rounded-md text-white font-semibold"
-				on:click|self={() => (openModalDelete = false)}
+				on:click={() => (openModalDelete = false)}
 			>
 				Cancelar
 			</button>
@@ -399,7 +528,7 @@
 					type="submit"
 					formaction="?/delete"
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
-					on:click={handleDelete}
+					on:click={submitDelete}
 				>
 					Eliminar
 				</button>
