@@ -15,8 +15,6 @@
 	};
 
 	$: visibleMonth = dayjs($store.selected);
-
-	// // console.log($store.selected, visibleMonth)
 	$: label = `${
 		$store.activeView === "days" ? visibleMonth.format("MMMM ") : visibleMonth.format("YYYY ")
 	}`;

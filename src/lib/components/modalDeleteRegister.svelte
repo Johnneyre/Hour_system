@@ -11,7 +11,6 @@
 	let disabled = false;
 
 	const resolver: SubmitFunction = async ({ formData }) => {
-		console.log(report)
 		formData.append('id', report.id_hours);
 
 		return async ({ result: { data, type } }: any) => {

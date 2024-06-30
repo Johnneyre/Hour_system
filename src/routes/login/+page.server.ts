@@ -14,7 +14,6 @@ export const actions = {
 
 		try {
 			const response = await fastAxios.post('/token', formData);
-			console.log(response);
 			if (response.status === 200) {
 				cookies.set('authToken', response.data.access_token, { path: '/' });
 			}
@@ -23,7 +22,7 @@ export const actions = {
 			const errorMessage = (error as { message: string }).message;
 			if (errorMessage.includes('401')) {
 				return fail(401, {
-					message: 'Usuario o contraseña incorrecta',
+					message: 'Usuario o contraseña incorrecto',
 					success: true
 				});
 			} else {

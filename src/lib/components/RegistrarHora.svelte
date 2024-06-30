@@ -17,7 +17,19 @@
 	export let tasks: any[];
 	export let reports: any[];
 
+	$: currentDay = dayjs(date).format('DD/MM/YYYY');
+	$: totalHoursDay = 0;
 	$: totalhours = addedTasks.reduce((prev, curr) => prev + (curr.hours || 0), 0);
+
+	$: {
+		totalHoursDay = 0;
+		reports.forEach((report) => {
+			const formattedDate = dayjs(report.date).format('DD/MM/YYYY');
+			if (formattedDate === currentDay) {
+				totalHoursDay += report.hours;
+			}
+		});
+	}
 
 	let description: string;
 	let disabled = false;
@@ -25,6 +37,7 @@
 	let addedTasks: any[] = [];
 	let lastTask = writable('');
 	let container: any;
+	let taskChecks: boolean[] = [];
 
 	function onWindowClick(e: any) {
 		if (openSelect) if (container.contains(e.target) == false) openSelect = false;
@@ -37,18 +50,27 @@
 		addedTasks = [...arr];
 	};
 
-	const handleTareaCheck = (e: any, task: any, i: number) => {
-		if (!e.target.checked) {
-			deleteTarea(task);
-			lastTask.set(addedTasks[addedTasks.length - 1]?.name || '');
-		} else {
-			if (addedTasks.includes(task)) return;
-			addedTasks = [...addedTasks, task];
-			lastTask.set(task.name);
-		}
-	};
+	const handleTareaCheck = (e: any, task: any) => {
+  const index = tasks.indexOf(task);
+  taskChecks[index] = e.target.checked;
+  if (e.target.checked) {
+    addedTasks = [task];
+    lastTask.set(task.name);
+  } else {
+		lastTask = writable('');
+    deleteTarea(task);
+  }
+  // Desmarcar los checks anteriores
+  taskChecks.forEach((checked, i) => {
+    if (i !== index) {
+      taskChecks[i] = false;
+    }
+  });
+};
 
 	const handleSubmit: SubmitFunction = async ({ formData, cancel }) => {
+		const sumHours = totalHoursDay + totalhours;
+
 		if (!addedTasks || !addedTasks.length) {
 			toast.error('Seleccione al menos una tarea');
 			return cancel();
@@ -59,12 +81,7 @@
 			return cancel();
 		}
 
-		let currentMonth = dayjs(date).format('YYYY-MM');
-		let hoursPerMonth = reports
-			.filter((report) => dayjs(report.date).format('YYYY-MM') === currentMonth)
-			.reduce((totalHours, report) => totalHours + report.hours, 0);
-
-		if (totalhours >= 24 || totalhours < 1) {
+		if (sumHours >= 24 || sumHours < 1) {
 			toast.error('Superaste el limite de horas que puedes agregar al dia');
 			return cancel();
 		}
@@ -72,9 +89,6 @@
 		formData.append('date', dayjs(date).format('YYYY-MM-DD'));
 		formData.append('hours', totalhours.toString());
 		formData.append('reports', JSON.stringify(reports));
-		formData.append('currentMonth', JSON.stringify(currentMonth));
-		formData.append('hoursPerMonth', JSON.stringify(hoursPerMonth));
-		formData.append('totalhours', JSON.stringify(totalhours));
 
 		for (const task of addedTasks) {
 			formData.append('tasks', JSON.stringify(task));
@@ -88,6 +102,11 @@
 				toast.error(data.message);
 			} else {
 				toast.success('Tu registro de horas ha sido guardado con éxito.');
+				description = '';
+				addedTasks = [];
+				totalhours = '';
+				tasks = [];
+				lastTask = writable('');
 
 				invalidateAll();
 				show = false;
@@ -146,8 +165,8 @@
 									<input
 										type="checkbox"
 										class="w-6 h-6 rounded-md min-w-[1.5rem] min-h-[1.5rem]"
-										on:change={(e) => handleTareaCheck(e, task, i)}
-										checked={addedTasks.some((obj) => obj.id === task.id_tasks)}
+										on:change={(e) => handleTareaCheck(e, task)}
+										checked={taskChecks[i]}
 									/>
 									<p>{task.name}</p>
 								</div>

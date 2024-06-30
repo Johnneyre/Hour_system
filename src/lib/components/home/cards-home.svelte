@@ -1,10 +1,6 @@
 <script lang="ts">
 	import IconPerson from '$lib/assets/icono-person.svg';
 	export let dedication: any;
-	export let tasks: any;
-
-	console.log(dedication)
-	console.log(tasks[0])
 </script>
 
 <div
@@ -12,9 +8,9 @@
 >
 	<img src={IconPerson} alt="cards" />
 	<p class="pt-2 text-dark-text">
-		{tasks[0]?.task.name} - {tasks[0]?.task.description}
+		{dedication?.name} - {dedication?.description}
 	</p>
 	<h2 class="text-3xl font-bold text-dark-text">
-		{tasks[0]?.hours} Horas
+		{dedication?.hours} Horas
 	</h2>
 </div>

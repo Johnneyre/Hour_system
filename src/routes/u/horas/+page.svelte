@@ -63,8 +63,6 @@
 		checkRegistros();
 	});
 
-	console.log(data.reports);
-
 	function checkRegistros() {
 		if (Array.isArray(data.reports)) {
 			filteredReports = data.reports.filter((report) =>
@@ -236,7 +234,7 @@
 						<!--INSERTAR CARDS-->
 						{#if filteredReports.length > 0}
 							<div
-								class="flex mb-[20px] justify-start h-[110px] container__cards_register w-full {filteredReports.length >
+								class="flex mb-[20px] justify-start h-[110px] gap-2 container__cards_register w-full {filteredReports.length >
 								1
 									? 'flex-wrap justify-center'
 									: ''} {filteredReports.length > 2 ? 'overflow-auto justify-start' : ''}"
@@ -249,6 +247,7 @@
 											bind:dayBlocked
 											bind:show={showEm}
 											bind:report
+											bind:date={$store.selected}
 											reports={data?.reports}
 											user={data?.user}
 										/>
@@ -450,6 +449,7 @@
 								bind:dayBlocked
 								bind:show={showEm}
 								bind:report
+								bind:date={$store.selected}
 								reports={data?.reports}
 								user={data?.user}
 							/>

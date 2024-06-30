@@ -12,14 +12,23 @@
 	export let reports: any[];
 	export let isDateBlocked: any;
 	export let dayBlocked: boolean;
+	export let date: dayjs.Dayjs;
 
 	let showModal = false;
-	let date: dayjs.Dayjs;
 	let currentReport = { ...report };
 	let disabled = false;
 	let openSelect = false;
 
-	console.log(currentReport.id_hours);
+	let currentDay = dayjs(date).format('DD/MM/YYYY');
+	let totalHoursDay = 0;
+
+	totalHoursDay = 0;
+	reports.forEach((reportss) => {
+		const formattedDate = dayjs(reportss.date).format('DD/MM/YYYY');
+		if (formattedDate === currentDay) {
+			totalHoursDay += reportss.hours;
+		}
+	});
 
 	const addTask = [
 		{
@@ -27,6 +36,8 @@
 			...currentReport.task
 		}
 	];
+
+	totalHoursDay -= addTask[0].hours;
 
 	let taskOrigin = currentReport.task.name;
 	let totalhours = currentReport.hours;
@@ -41,7 +52,9 @@
 	};
 
 	const handleSubmit: SubmitFunction = async ({ formData, cancel }) => {
-		if (totalhours >= 24) {
+		const sumHours = totalHoursDay + totalhours;
+
+		if (sumHours >= 24) {
 			toast.error('Superaste el limite de horas que puedes agregar');
 			return cancel();
 		}

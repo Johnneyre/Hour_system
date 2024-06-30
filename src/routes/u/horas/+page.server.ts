@@ -58,9 +58,6 @@ export const actions: Actions = {
 		const formData = await request.formData();
 		const body = Object.fromEntries(formData) as unknown as body;
 
-		console.log(body);
-
-		console.log(JSON.parse(body.hoursPerMonth));
 		body.tasks = (formData.getAll('tasks') as unknown as string[]).map((rt) => JSON.parse(rt));
 
 		try {

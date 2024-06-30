@@ -6,8 +6,6 @@
 	export let report: any;
 	export let dayBlocked: boolean;
 
-	console.log(report);
-
 	let showDm = false;
 	export let showEm;
 </script>
@@ -18,7 +16,7 @@
 {/if}
 
 <section
-	class="flex flex-col justify-between min-w-[17rem] items-center py-2 md:mx-0 container_register max-w-[46%]"
+	class="flex flex-col justify-between min-w-[13rem] items-center py-2 md:mx-0 container_register max-w-[46%]"
 >
 	<div
 		class="card border border-black rounded-2xl h-auto my-1 w-full mx-auto p-3 bg-red-betel container_card_register"
@@ -52,12 +50,3 @@
 		</span>
 	</div>
 </section>
-
-<style>
-	@media screen and (max-width: 768px) {
-		.container_register {
-			margin-left: 10px;
-			margin-right: 10px;
-		}
-	}
-</style>
