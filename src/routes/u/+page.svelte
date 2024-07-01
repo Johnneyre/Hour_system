@@ -44,7 +44,7 @@
 						</p>
 						<div class="flex items-center justify-start pt-4">
 							<a
-								href="/u/horas"
+								href="/u/admin"
 								class="text-white whitespace-nowrap font-semibold bg-red-betel rounded-xl py-3 px-8 md:px-12 text-center"
 								>Administrar</a
 							>

@@ -234,7 +234,7 @@
 						<!--INSERTAR CARDS-->
 						{#if filteredReports.length > 0}
 							<div
-								class="flex mb-[20px] justify-start h-[110px] gap-2 container__cards_register w-full {filteredReports.length >
+								class="flex mb-[20px] justify-start h-[110px] gap-2 container__cards_register px-2 w-full {filteredReports.length >
 								1
 									? 'flex-wrap justify-center'
 									: ''} {filteredReports.length > 2 ? 'overflow-auto justify-start' : ''}"

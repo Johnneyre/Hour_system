@@ -16,7 +16,7 @@
 {/if}
 
 <section
-	class="flex flex-col justify-between min-w-[13rem] items-center py-2 md:mx-0 container_register max-w-[46%]"
+	class="flex flex-col justify-between min-w-[12rem] items-center py-2 md:mx-0 container_register max-w-[46%]"
 >
 	<div
 		class="card border border-black rounded-2xl h-auto my-1 w-full mx-auto p-3 bg-red-betel container_card_register"
