@@ -43,8 +43,8 @@ export const actions: Actions = {
 
 		console.log(data)
 
-		const nameTask = String(data.get('Nombre de la tarea'))
-		const descripcion = String(data.get('descripcion'))
+		const nameTask = String(data.get('taskName'))
+		const descripcion = String(data.get('taskDescription'))
 		const newTask = {
 			name: nameTask,
 			description: descripcion
@@ -60,15 +60,13 @@ export const actions: Actions = {
 		function formatFecha(fecha: any) {
 			console.log(fecha)
 			if (fecha) {
-				const [day, month, year] = fecha.split('-');
-				const fechaOrdenada = `${year}/${month.padStart(2, '0')}/${day.padStart(2, '0')}`;
-
-				const fechaObjeto = new Date(fechaOrdenada);
+				const fechaObjeto = new Date(fecha);
+				console.log(fechaObjeto);
 				console.log(fechaObjeto.toISOString());
 
 				return fechaObjeto.toISOString();
 			} else {
-				return ''
+				return '';
 			}
 		}
 
@@ -101,13 +99,61 @@ export const actions: Actions = {
 
 	},
 
-	update: async ({ request, locals, locals: { user } }) => {
+	updateTask: async ({ request, locals, locals: { user } }) => {
+		const data = await request.formData()
+		console.log(data)
+		try {
+			const taskId = Number(data.get('taskId'))
+			const taskName = data.get('taskName')
+			const taskDescription = data.get('taskDescription')
 
-		return {
-			success: true,
-			type: 'create',
-			message: 'Hora guardada exitosamente'
-		};
+			console.log(taskId)
+
+			const updateTask = {
+				"name": taskName,
+				"description": taskDescription
+			}
+
+			console.log(updateTask)
+
+
+			const responseEdit = await fastAxios.put(`/tasks/${taskId}`, updateTask);
+		} catch (error) {
+			console.log(error)
+		}
+
+	},
+	updateUser: async ({ request, locals, locals: { user } }) => {
+		const data = await request.formData()
+		console.log(data)
+
+		try {
+			const UserId = Number(data.get('UserId'))
+			const username = data.get('username')
+			const password = data.get('password')
+			const fullName = data.get('fullName')
+			const C_I = data.get('C_I')
+			const bithdate = data.get('bithdate')
+			const id_rol = data.get('rol')
+
+			console.log(UserId)
+			console.log(id_rol)
+
+			const updateUser = {
+				"username": username,
+				"password": password,
+				"fullName": fullName,
+				"C_I": C_I,
+				"bithdate": bithdate,
+				"position": "absoluto",
+				"id_rol": id_rol
+			}
+			console.log(updateUser)
+
+			const responseEdit = await fastAxios.put(`/users/${UserId}`, updateUser);
+		} catch (error) {
+			console.log(error)
+		}
 	},
 	delete: async ({ request, locals }) => {
 		const data = await request.formData()

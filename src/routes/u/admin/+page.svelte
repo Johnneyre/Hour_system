@@ -1,10 +1,11 @@
 <script lang="ts">
 	import MobileBottomTapBar from '$lib/components/mobile-bottom-tap-bar.svelte';
-	import { ChevronDown, ChevronUp, Icon, Pencil, Plus, Trash } from 'svelte-hero-icons';
+	import { ChevronDown, ChevronUp, Icon, Pencil, Plus, Trash, User } from 'svelte-hero-icons';
 	import ModalLarge from '$lib/components/ModalLarge.svelte';
 	import Portal from 'svelte-portal';
 	import type { ActionData, PageData } from './$types';
 	import { enhance } from '$app/forms';
+	import type { SubmitFunction } from '@sveltejs/kit';
 
 	export let data: PageData;
 	export let form: ActionData;
@@ -18,11 +19,12 @@
 	let openModalUser: boolean;
 	let openModalTarea: boolean;
 	let openModalDelete: boolean;
+	let openModalEditU: boolean;
+	let openModalEditT: boolean;
 
 	let ShowHoursReport: boolean = false;
 
 	let selectedUser: string = '';
-	let userData: any;
 	let userN: any;
 
 	let fechaInicio: string = '';
@@ -34,14 +36,26 @@
 
 	let idDelete: string;
 
+	let idEdit: any;
+	$: idEdit;
+
+	let taskName: string;
+	let taskDescription: string;
+
+	let username: string;
+	let password: string;
+	let fullName: string;
+	let C_I: string;
+	let bithdate: string;
+	let id_rol: string;
+
 	const formData = new FormData();
 
-	async function submitDelete({ formData }: any) {
+	const submitDelete: SubmitFunction = ({ formData }: any) => {
 		if (modalDeleteType == 'tarea') {
 			console.log('Eliminar tarea');
 			console.log(idDelete);
 			console.log(modalDeleteType);
-			formData.append('deleteType', modalDeleteType);
 			formData.append('deleteId', String(idDelete));
 		} else {
 			console.log('Eliminar usuario');
@@ -49,26 +63,15 @@
 			formData.append('deleteType', modalDeleteType);
 			formData.append('deleteId', String(idDelete));
 		}
-		await new Promise((resolve) => setTimeout(resolve, 0));
 		openModalDelete = false;
-	}
+	};
 
 	async function submitCreate({ formData }: any) {
 		console.log(formData);
 		if (modalDeleteType == 'tarea') {
 			console.log('Crear tarea');
-
-			let taskName = String(formData.get('Nombre de la tarea'));
-			let taskDescription = String(formData.get('descripcion'));
 		} else {
 			console.log('Crear usuario');
-			let username = String(formData.get('username'));
-			let password = String(formData.get('password'));
-			let fullName = String(formData.get('fullName'));
-			let C_I = String(formData.get('C_I'));
-			let bithdate = String(formData.get('bithdate'));
-			let id_rol = String(formData.get('rol'));
-
 			console.log(username, password, fullName, C_I, bithdate, id_rol);
 		}
 		await new Promise((resolve) => setTimeout(resolve, 0));
@@ -81,6 +84,22 @@
 		console.log(userData);
 		userN = userData ? userData.fullName : '';
 		console.log(userN);
+	}
+
+	async function editTask(id: any) {
+		modalDeleteType = 'tarea';
+		idEdit = id;
+		openModalEditT = true;
+		console.log(idEdit);
+		console.log(data.Task[id]);
+	}
+
+	async function editUser(id: any) {
+		modalDeleteType = 'usuario';
+		idEdit = id;
+		openModalEditU = true;
+		console.log(idEdit);
+		console.log(data.Users[id]);
 	}
 
 	async function clearInput() {
@@ -210,7 +229,7 @@
 					</span>
 				</div>
 			</summary>
-			{#each data.Users as users}
+			{#each data.Users as users, i}
 				<div class=" flex justify-between items-center py-5">
 					<!--Link Titulo-->
 
@@ -220,9 +239,15 @@
 
 					<!--Link Acciones-->
 					<div class="flex justify-around items-center ml-2">
-						<p class="cursor-pointer rounded-full text-white bg-[#ff461e] p-2 mx-1 sm:mx-2">
+						<button
+							on:click={() => {
+								editUser(i);
+							}}
+							type="button"
+							class="cursor-pointer rounded-full text-white bg-[#ff461e] p-2 mx-1 sm:mx-2"
+						>
 							<Icon src={Pencil} class="w-4 h-4" />
-						</p>
+						</button>
 						<button
 							on:click={() => {
 								modalDeleteType = 'usuario';
@@ -231,7 +256,8 @@
 							}}
 							type="button"
 							class="cursor-pointer rounded-full text-white bg-[#ff461e] p-2 mx-1 sm:mx-2"
-							><Icon src={Trash} class="w-4 h-4" /></button
+						>
+							<Icon src={Trash} class="w-4 h-4" /></button
 						>
 					</div>
 				</div>
@@ -271,7 +297,7 @@
 					</span>
 				</div>
 			</summary>
-			{#each data.Task as task}
+			{#each data.Task as task, i}
 				<div class=" flex justify-between py-2 w-full">
 					<!--Link Titulo-->
 					<div class="w-[40%]">
@@ -280,9 +306,15 @@
 
 					<!--Link Acciones-->
 					<div class="flex justify-around items-center">
-						<p class="cursor-pointer rounded-full text-white bg-[#ff461e] p-2 mx-1 sm:mx-2">
+						<button
+							on:click={() => {
+								editTask(i);
+							}}
+							type="button"
+							class="cursor-pointer rounded-full text-white bg-[#ff461e] p-2 mx-1 sm:mx-2"
+						>
 							<Icon src={Pencil} class="w-4 h-4" />
-						</p>
+						</button>
 						<button
 							on:click={() => {
 								modalDeleteType = 'tarea';
@@ -395,24 +427,28 @@
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Nombre de usuario"
 					name="username"
+					bind:value={username}
 				/>
 				<p class="sm:text-lg text-white">Contraseña</p>
 				<input
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Contraseña"
 					name="password"
+					bind:value={password}
 				/>
 				<p class="sm:text-lg text-white">Nombre y apellido</p>
 				<input
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Nombre y apellido"
 					name="fullName"
+					bind:value={fullName}
 				/>
 				<p class="sm:text-lg text-white">Número de cedula</p>
 				<input
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Número de cedula"
 					name="C_I"
+					bind:value={C_I}
 				/>
 				<p class="sm:text-lg text-white">Fecha de nacimiento</p>
 				<input
@@ -420,12 +456,14 @@
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Fecha de nacimiento"
 					name="bithdate"
+					bind:value={bithdate}
 				/>
 				<p class="sm:text-lg text-white">Rol</p>
 				<select
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Rol del usuario"
 					name="rol"
+					bind:value={id_rol}
 				>
 					<option disabled selected hidden value="">Selecione un rol</option>
 					<option value="1">Administrador</option>
@@ -453,6 +491,98 @@
 	</ModalLarge>
 </Portal>
 
+<!-- Modal de edit Usuario-->
+<Portal>
+	<ModalLarge bind:open={openModalEditU}>
+		<form method="post" use:enhance={editUser}>
+			<div class="flex flex-col justify-center">
+				<p class="text-2xl text-white text-center font-bold leading-8 pt-6 pb-4">Editar Usuario</p>
+			</div>
+			<input type="hidden" name="UserId" value={data.Users[idEdit].id_user} />
+			<div class="w-full px-4">
+				<p class="sm:text-lg text-white">Nombre de usuario</p>
+				<input type="hidden" value="usuario" name="typeCrear" />
+				<input
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Nombre de usuario"
+					name="username"
+					bind:value={data.Users[idEdit].username}
+				/>
+				<p class="sm:text-lg text-white">Contraseña</p>
+				<input
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Contraseña"
+					name="password"
+					bind:value={data.Users[idEdit].password}
+				/>
+				<p class="sm:text-lg text-white">Nombre y apellido</p>
+				<input
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Nombre y apellido"
+					name="fullName"
+					bind:value={data.Users[idEdit].fullName}
+				/>
+				<p class="sm:text-lg text-white">Número de cedula</p>
+				<input
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Número de cedula"
+					name="C_I"
+					bind:value={data.Users[idEdit].C_I}
+				/>
+				<p class="sm:text-lg text-white">Fecha de nacimiento</p>
+				<input
+					type="date"
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Fecha de nacimiento"
+					name="bithdate"
+					bind:value={data.Users[idEdit].bithdate}
+				/>
+				<!-- <p class="sm:text-lg text-white">Estado</p>
+				<select
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Rol del usuario"
+					name="rol"
+					bind:value={data.Users[idEdit].id_rol}
+				>
+					<option value=true>Activo</option>
+					<option value=false>Inactivo</option>
+				</select> -->
+				<p class="sm:text-lg text-white">Rol</p>
+				<select
+					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
+					placeholder="Rol del usuario"
+					name="rol"
+					bind:value={data.Users[idEdit].id_rol}
+				>
+					<option value={data.Users[idEdit].id_rol}></option>
+					<option value="1">Administrador</option>
+					<option value="2">Usuario</option>
+				</select>
+			</div>
+			<div class="flex my-6 pt-4 justify-around">
+				<button
+					type="button"
+					class="text-center h-14 rounded-md text-white font-semibold"
+					on:click={() => (openModalEditU = false)}
+				>
+					Cancelar
+				</button>
+				<button
+					type="submit"
+					formaction="?/updateUser"
+					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
+					on:click={(e) => {
+						editUser(e);
+						window.location.reload();
+					}}
+				>
+					Editar
+				</button>
+			</div>
+		</form>
+	</ModalLarge>
+</Portal>
+
 <!-- Modal Tarea -->
 <Portal>
 	<ModalLarge bind:open={openModalTarea}>
@@ -467,14 +597,16 @@
 				<input
 					class="inline sm:text-lg mr-auto mb-4 mt-1 w-full bg-stone-300 pl-3 rounded-md"
 					placeholder="Nombre del usuario"
-					name="Nombre de la tarea"
+					name="taskName"
+					bind:value={taskName}
 				/>
 
 				<p class="sm:text-lg text-white">Descripción</p>
 				<input
 					class="inline sm:text-lg mr-auto mb-4 mt-1 w-full bg-stone-300 pl-3 rounded-md"
 					placeholder="Descripción"
-					name="descripcion"
+					name="taskDescription"
+					bind:value={taskDescription}
 				/>
 			</div>
 
@@ -490,9 +622,60 @@
 					type="submit"
 					formaction="?/createTask"
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
-					on:click={submitCreate}
+					on:click={() => {
+						submitCreate;
+						window.location.reload();
+					}}
 				>
 					Crear
+				</button>
+			</div>
+		</form>
+	</ModalLarge>
+</Portal>
+
+<!-- Modal edit Tarea -->
+<Portal>
+	<ModalLarge bind:open={openModalEditT}>
+		<form method="post" use:enhance={(e) => submitCreate(e)}>
+			<div class="flex flex-col justify-center">
+				<p class="text-2xl text-white text-center font-bold leading-8 pt-6 pb-4">Editar Tarea</p>
+			</div>
+			<input type="hidden" name="taskId" value={data.Task[idEdit].id_tasks} />
+			<div class="w-full px-4">
+				<p class="sm:text-lg text-white">Nombre de la tarea</p>
+				<input type="hidden" value="tarea" name="typeCrear" />
+				<input
+					class="inline sm:text-lg mr-auto mb-4 mt-1 w-full bg-stone-300 pl-3 rounded-md"
+					placeholder="Nombre de la tarea"
+					name="taskName"
+					bind:value={data.Task[idEdit].name}
+				/>
+
+				<p class="sm:text-lg text-white">Descripción</p>
+				<input
+					class="inline sm:text-lg mr-auto mb-4 mt-1 w-full bg-stone-300 pl-3 rounded-md"
+					placeholder="Descripción"
+					name="taskDescription"
+					bind:value={data.Task[idEdit].description}
+				/>
+			</div>
+
+			<div class="flex my-6 pt-4 justify-around">
+				<button
+					type="button"
+					class="text-center h-14 rounded-md text-white font-semibold"
+					on:click={() => (openModalEditT = false)}
+				>
+					Cancelar
+				</button>
+				<button
+					type="submit"
+					formaction="?/updateTask"
+					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
+					on:click={submitCreate}
+				>
+					Editar
 				</button>
 			</div>
 		</form>
@@ -524,11 +707,11 @@
 				Cancelar
 			</button>
 			<form method="post" use:enhance={(e) => submitDelete(e)}>
+				<input type="hidden" bind:value={modalDeleteType} name="deleteType" />
 				<button
 					type="submit"
 					formaction="?/delete"
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
-					on:click={submitDelete}
 				>
 					Eliminar
 				</button>
