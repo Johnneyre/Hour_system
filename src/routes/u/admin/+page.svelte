@@ -3,6 +3,7 @@
 	import { ChevronDown, ChevronUp, Icon, Pencil, Plus, Trash, User } from 'svelte-hero-icons';
 	import ModalLarge from '$lib/components/ModalLarge.svelte';
 	import Portal from 'svelte-portal';
+	import { toast } from '../../../store/toast';
 	import type { ActionData, PageData } from './$types';
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '@sveltejs/kit';
@@ -13,8 +14,6 @@
 	let totalHours = 0;
 
 	$: form;
-
-	console.log(data);
 
 	let openModalUser: boolean;
 	let openModalTarea: boolean;
@@ -53,13 +52,8 @@
 
 	const submitDelete: SubmitFunction = ({ formData }: any) => {
 		if (modalDeleteType == 'tarea') {
-			console.log('Eliminar tarea');
-			console.log(idDelete);
-			console.log(modalDeleteType);
 			formData.append('deleteId', String(idDelete));
 		} else {
-			console.log('Eliminar usuario');
-			console.log(idDelete);
 			formData.append('deleteType', modalDeleteType);
 			formData.append('deleteId', String(idDelete));
 		}
@@ -67,54 +61,36 @@
 	};
 
 	async function submitCreate({ formData }: any) {
-		console.log(formData);
-		if (modalDeleteType == 'tarea') {
-			console.log('Crear tarea');
-		} else {
-			console.log('Crear usuario');
-			console.log(username, password, fullName, C_I, bithdate, id_rol);
-		}
-		await new Promise((resolve) => setTimeout(resolve, 0));
-		openModalDelete = false;
+		openModalUser = false;
+		openModalTarea = false;
 	}
 
 	async function GetHourAndTask() {
-		console.log('funciona');
 		const userData = data.Users.find((user: any) => user.id_user === selectedUser);
-		console.log(userData);
 		userN = userData ? userData.fullName : '';
-		console.log(userN);
 	}
 
 	async function editTask(id: any) {
 		modalDeleteType = 'tarea';
 		idEdit = id;
 		openModalEditT = true;
-		console.log(idEdit);
-		console.log(data.Task[id]);
 	}
 
 	async function editUser(id: any) {
 		modalDeleteType = 'usuario';
 		idEdit = id;
 		openModalEditU = true;
-		console.log(idEdit);
-		console.log(data.Users[id]);
 	}
 
 	async function clearInput() {
 		selectedUser = '';
 		fechaInicio = '';
 		fechaFin = '';
-		ShowHoursReport = false;
 	}
 
 	function formatFecha(fecha: any) {
-		console.log(fecha);
 		if (fecha) {
 			const fechaObjeto = new Date(fecha);
-			console.log(fechaObjeto);
-			console.log(fechaObjeto.toISOString());
 
 			return fechaObjeto.toISOString();
 		} else {
@@ -122,73 +98,72 @@
 		}
 	}
 
-	$: if (form?.hours) {
-		let fechaI = new Date();
-		let fechaF = new Date();
-		if (fechaInicio == '') {
-			fechaI = new Date('2024-06-01T00:00:00.000Z');
-		} else {
-			fechaI = new Date(formatFecha(fechaInicio));
-		}
-		if (fechaFin == '') {
-			let fechaActual = new Date().toISOString();
-		} else {
-			fechaF = new Date(formatFecha(fechaFin));
+	$: if (form) {
+
+		if (form?.returnDelete) {
+			toast.success(form.messageDelete);
 		}
 
-		if (fechaInicio == '' && fechaFin == '') {
-			const filteredHours = form.hours.filter((hour: any) => {
-				const createdAtDate = new Date(hour.created_at);
-				console.log(createdAtDate);
-				return createdAtDate >= fechaI && createdAtDate <= fechaF;
-			});
+		if (form?.responseCreate) {
+			toast.success(form.messageCreate);
+		}
 
-			console.log(form.hours);
-			const horas_lista = form.hours?.map((item: { hours: any }) => item.hours);
+		if (form?.responseEdit) {
+			toast.success(form.messageEdit);
+		}
 
-			console.log(horas_lista);
+		if (form?.hours) {
+			let fechaI = new Date();
+			let fechaF = new Date();
+			if (fechaInicio == '') {
+				fechaI = new Date('2024-06-01T00:00:00.000Z');
+			} else {
+				fechaI = new Date(formatFecha(fechaInicio));
+			}
+			if (fechaFin == '') {
+				let fechaActual = new Date().toISOString();
+			} else {
+				fechaF = new Date(formatFecha(fechaFin));
+			}
 
-			// Calculamos la suma utilizando la función reduce()
-			totalHours = horas_lista?.reduce((acc: any, curr: any) => acc + curr, 0);
+			if (fechaInicio == '' && fechaFin == '') {
+				const filteredHours = form.hours.filter((hour: any) => {
+					const createdAtDate = new Date(hour.created_at);
+					return createdAtDate >= fechaI && createdAtDate <= fechaF;
+				});
 
-			console.log(totalHours);
+				const horas_lista = form.hours?.map((item: { hours: any }) => item.hours);
 
-			totalTasks = 0;
-			for (const item of form.hours) {
-				if (item.task) {
-					totalTasks++;
+				// Calculamos la suma utilizando la función reduce()
+				totalHours = horas_lista?.reduce((acc: any, curr: any) => acc + curr, 0);
+
+				totalTasks = 0;
+				for (const item of form.hours) {
+					if (item.task) {
+						totalTasks++;
+					}
+				}
+			} else {
+				const filteredHours = form.hours.filter((hour: any) => {
+					const createdAtDate = new Date(hour.created_at);
+					return createdAtDate >= fechaI && createdAtDate <= fechaF;
+				});
+
+				const horas_lista = filteredHours.map((item: { hours: any }) => item.hours);
+
+				// Calculamos la suma utilizando la función reduce()
+				totalHours = horas_lista?.reduce((acc: any, curr: any) => acc + curr, 0);
+
+				totalTasks = 0;
+				for (const item of filteredHours) {
+					if (item.task) {
+						totalTasks++;
+					}
 				}
 			}
-			console.log(totalTasks);
-		} else {
-			const filteredHours = form.hours.filter((hour: any) => {
-				const createdAtDate = new Date(hour.created_at);
-				console.log(createdAtDate);
-				return createdAtDate >= fechaI && createdAtDate <= fechaF;
-			});
 
-			console.log(filteredHours);
-
-			console.log(form.hours);
-			const horas_lista = filteredHours.map((item: { hours: any }) => item.hours);
-
-			console.log(horas_lista);
-
-			// Calculamos la suma utilizando la función reduce()
-			totalHours = horas_lista?.reduce((acc: any, curr: any) => acc + curr, 0);
-
-			console.log(totalHours);
-
-			totalTasks = 0;
-			for (const item of filteredHours) {
-				if (item.task) {
-					totalTasks++;
-				}
-			}
-			console.log(totalTasks);
+			ShowHoursReport = true;
 		}
-
-		ShowHoursReport = true;
 	}
 </script>
 
@@ -379,14 +354,17 @@
 				</button>
 				<button
 					type="button"
-					on:click={clearInput}
+					on:click={() => {
+						ShowHoursReport = false
+						clearInput()
+					}}
 					class="rounded-[20px] bg-[#ff461e] h-8 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300 mx-auto"
 				>
 					Limpiar
 				</button>
 			</div>
 		</form>
-		{#if ShowHoursReport}
+		{#if ShowHoursReport == true}
 			<div class="p-3 flex justify-between bg-[#131314] rounded-2xl">
 				<div
 					class=" flex flex-col text-white bg-[#1e1f20] p-5 rounded-2xl w-[31%] items-center justify-center"
@@ -624,7 +602,7 @@
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
 					on:click={() => {
 						submitCreate;
-						window.location.reload();
+						
 					}}
 				>
 					Crear
@@ -673,7 +651,7 @@
 					type="submit"
 					formaction="?/updateTask"
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
-					on:click={submitCreate}
+					on:click={() => {openModalEditT = false}}
 				>
 					Editar
 				</button>

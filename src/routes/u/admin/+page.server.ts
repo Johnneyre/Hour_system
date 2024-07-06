@@ -16,13 +16,10 @@ export const load = async () => {
 export const actions: Actions = {
 	getReport: async ({ request }) => {
 		const data = await request.formData()
-		console.log(data)
-
 		const userId = String(data.get('usuario'))
 
 		try {
 			const responseHour = await fastAxios.get(`/hours/by-user/${userId}`)
-			console.log(responseHour.data)
 			if (responseHour.data == '') {
 				return {
 					hours: [],
@@ -41,16 +38,14 @@ export const actions: Actions = {
 	createTask: async ({ request, locals, locals: { user } }) => {
 		const data = await request.formData()
 
-		console.log(data)
-
 		const nameTask = String(data.get('taskName'))
 		const descripcion = String(data.get('taskDescription'))
 		const newTask = {
 			name: nameTask,
 			description: descripcion
 		}
-		console.log(newTask)
 		const responseTask = await fastAxios.post('/tasks', newTask);
+		return { responseCreate: responseTask.status, messageCreate: 'La tarea se a creado exitosamente'}
 
 	},
 
@@ -58,19 +53,14 @@ export const actions: Actions = {
 		const data = await request.formData()
 
 		function formatFecha(fecha: any) {
-			console.log(fecha)
 			if (fecha) {
 				const fechaObjeto = new Date(fecha);
-				console.log(fechaObjeto);
-				console.log(fechaObjeto.toISOString());
 
 				return fechaObjeto.toISOString();
 			} else {
 				return '';
 			}
 		}
-
-		console.log(data)
 
 		const username = data.get('username')
 		const password = data.get('password')
@@ -91,8 +81,8 @@ export const actions: Actions = {
 		}
 
 		try {
-			console.log(newUser);
 			const responseUser = await fastAxios.post("/users", newUser);
+			return { responseCreate: responseUser.status, messageCreate: 'El usuario se a creado exitosamente'}
 		} catch (error) {
 			console.log(error);
 		}
@@ -101,23 +91,19 @@ export const actions: Actions = {
 
 	updateTask: async ({ request, locals, locals: { user } }) => {
 		const data = await request.formData()
-		console.log(data)
+
 		try {
 			const taskId = Number(data.get('taskId'))
 			const taskName = data.get('taskName')
 			const taskDescription = data.get('taskDescription')
-
-			console.log(taskId)
 
 			const updateTask = {
 				"name": taskName,
 				"description": taskDescription
 			}
 
-			console.log(updateTask)
-
-
 			const responseEdit = await fastAxios.put(`/tasks/${taskId}`, updateTask);
+			return { responseEdit: responseEdit.status, messageEdit: 'La tarea se a editado exitosamente'}
 		} catch (error) {
 			console.log(error)
 		}
@@ -125,7 +111,6 @@ export const actions: Actions = {
 	},
 	updateUser: async ({ request, locals, locals: { user } }) => {
 		const data = await request.formData()
-		console.log(data)
 
 		try {
 			const UserId = Number(data.get('UserId'))
@@ -136,21 +121,19 @@ export const actions: Actions = {
 			const bithdate = data.get('bithdate')
 			const id_rol = data.get('rol')
 
-			console.log(UserId)
-			console.log(id_rol)
-
 			const updateUser = {
 				"username": username,
 				"password": password,
 				"fullName": fullName,
 				"C_I": C_I,
 				"bithdate": bithdate,
+				"status": true,
 				"position": "absoluto",
 				"id_rol": id_rol
 			}
-			console.log(updateUser)
 
 			const responseEdit = await fastAxios.put(`/users/${UserId}`, updateUser);
+			return { responseEdit: responseEdit.status, messageEdit: 'El usuario se a actualizado exitosamente'}
 		} catch (error) {
 			console.log(error)
 		}
@@ -160,17 +143,13 @@ export const actions: Actions = {
 
 		const deleteType = String(data.get('deleteType'))
 		const deleteId = String(data.get('deleteId'))
-		// console.log(body)
-		if (deleteType == 'tarea') {
-			console.log('Eliminar tarea');
-			console.log(deleteId)
-			const responseDeleteT = await (fastAxios.delete(`/tasks/${deleteId}`))
-		} else {
-			console.log('Eliminar usuario');
-			console.log(deleteType)
-			const responseDeleteU = await (fastAxios.delete(`/users/${deleteId}`))
-		}
 
-		return { success: true, type: 'delete', message: 'Eliminado exitosamente' };
+		if (deleteType == 'tarea') {
+			const responseDeleteT = await (fastAxios.delete(`/tasks/${deleteId}`))
+			return { returnDelete: responseDeleteT.status, messageDelete: 'La tarea se a eliminado exitosamente'}
+		} else {
+			const responseDeleteU = await (fastAxios.delete(`/users/${deleteId}`))
+			return { returnDelete: responseDeleteU.status, messageDelete: 'El usuario se a eliminado exitosamente'}
+		}
 	}
 };
