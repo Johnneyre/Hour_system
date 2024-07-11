@@ -36,8 +36,6 @@
 		// @ts-ignore
 		$dim.w = mountW;
 		count += 1;
-	} else {
-		// // console.log(count, mountH,mountW)
 	}
 
 	const forceUpdate = writable(false);

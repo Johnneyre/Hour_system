@@ -8,12 +8,9 @@
 >
 	<img src={IconPerson} alt="cards" />
 	<p class="pt-2 text-dark-text">
-		{dedication?.project_cost_center} - {dedication?.project_name}
+		{dedication?.name} - {dedication?.description}
 	</p>
-	<h1 class="text-3xl font-bold text-dark-text">
-		{Math.round((dedication?.percentage_dedication + Number.EPSILON) * 100) / 100} %
-	</h1>
-	<h2 class="text-md font-semibold text-dark-text">
-		{dedication.project_hours} Horas
+	<h2 class="text-3xl font-bold text-dark-text">
+		{dedication?.hours} Horas
 	</h2>
 </div>

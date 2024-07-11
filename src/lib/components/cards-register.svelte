@@ -5,16 +5,6 @@
 
 	export let report: any;
 	export let dayBlocked: boolean;
-	export let widthMax: boolean = false;
-	export let maxLenght = 1
-
-	let activeClass = false
-
-	if (widthMax && maxLenght > 1) {
-		activeClass = true
-	}
-
-	console.log(report);
 
 	let showDm = false;
 	export let showEm;
@@ -26,13 +16,14 @@
 {/if}
 
 <section
-	class="flex flex-col justify-between items-center py-2 md:mx-0 container_register {activeClass ? 'max-w-[46%]' : 'w-full'}"
+	class="flex flex-col justify-between min-w-[12rem] items-center py-2 md:mx-0 container_register max-w-[46%]"
 >
 	<div
 		class="card border border-black rounded-2xl h-auto my-1 w-full mx-auto p-3 bg-red-betel container_card_register"
 	>
 		<h1 class="font-bold text-lg text-blue-100">
-			{report.hours} horas
+			{report.hours}
+			{report.hours > 1 ? 'horas' : 'hora'}
 		</h1>
 		<span class="flex flex-row items-center justify-start">
 			<p class="text-blue-100 text-base">
@@ -59,12 +50,3 @@
 		</span>
 	</div>
 </section>
-
-<style>
-	@media screen and (max-width: 768px) {
-		.container_register {
-			margin-left: 10px;
-			margin-right: 10px;
-		}
-	}
-</style>

@@ -63,8 +63,6 @@
 		checkRegistros();
 	});
 
-	console.log(data.reports);
-
 	function checkRegistros() {
 		if (Array.isArray(data.reports)) {
 			filteredReports = data.reports.filter((report) =>
@@ -236,21 +234,20 @@
 						<!--INSERTAR CARDS-->
 						{#if filteredReports.length > 0}
 							<div
-								class="flex mb-[20px] h-[110px] container__cards_register w-full {filteredReports.length >
+								class="flex mb-[20px] justify-start h-[110px] gap-2 container__cards_register px-2 w-full {filteredReports.length >
 								1
-									? 'flex-wrap'
-									: ''} {filteredReports.length > 2 ? 'overflow-auto' : ''}"
+									? 'flex-wrap justify-center'
+									: ''} {filteredReports.length > 2 ? 'overflow-auto justify-start' : ''}"
 							>
 								{#each filteredReports as report}
-									<CardsRegister bind:report bind:showEm bind:dayBlocked widthMax maxLenght={filteredReports.length} />
+									<CardsRegister bind:report bind:showEm bind:dayBlocked />
 									{#if showEm == report.id_hours.toString()}
 										<EditarHora
 											{isDateBlocked}
 											bind:dayBlocked
 											bind:show={showEm}
 											bind:report
-											projects={data?.projects}
-											tasks={data.tasks}
+											bind:date={$store.selected}
 											reports={data?.reports}
 											user={data?.user}
 										/>
@@ -283,7 +280,7 @@
 									}}
 									class="bg-red-betel hover:bg-[#ff471e73]"
 									style="width:161px;
-               height:40px;
+               height: 40px;
                padding: 10px, 30px, 10px, 30px;
                border-radius: 10px;
                gap: 6px;"
@@ -452,8 +449,7 @@
 								bind:dayBlocked
 								bind:show={showEm}
 								bind:report
-								projects={data?.projects}
-								tasks={data.tasks}
+								bind:date={$store.selected}
 								reports={data?.reports}
 								user={data?.user}
 							/>
