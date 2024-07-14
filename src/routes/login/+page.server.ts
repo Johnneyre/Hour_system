@@ -15,7 +15,7 @@ export const actions = {
 		try {
 			const response = await fastAxios.post('/token', formData);
 			if (response.status === 200) {
-				cookies.set('authToken', response.data.access_token, { path: '/' });
+				cookies.set('authToken', response.data.access_token, { path: '/' , maxAge: 3600});
 			}
 		} catch (error) {
 			console.log(error);
