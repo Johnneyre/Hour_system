@@ -26,8 +26,8 @@
 	let selectedUser: string = '';
 	let userN: any;
 
-	let fechaInicio: string = '';
-	let fechaFin: string = '';
+	let fechaInicio: string;
+	let fechaFin: string;
 
 	let totalTasks: number = 0;
 
@@ -60,57 +60,16 @@
 		openModalDelete = false;
 	};
 
-	async function submitCreate({ formData }: any) {
-		openModalUser = false;
+	async function submitCreate() {
+		taskName = '';
+		taskDescription = '';
 		openModalTarea = false;
+		openModalUser = false;
 	}
 
 	async function GetHourAndTask() {
 		const userData = data.Users.find((user: any) => user.id_user === selectedUser);
 		userN = userData ? userData.fullName : '';
-	}
-
-	async function editTask(id: any) {
-		modalDeleteType = 'tarea';
-		idEdit = id;
-		openModalEditT = true;
-	}
-
-	async function editUser(id: any) {
-		modalDeleteType = 'usuario';
-		idEdit = id;
-		openModalEditU = true;
-	}
-
-	async function clearInput() {
-		selectedUser = '';
-		fechaInicio = '';
-		fechaFin = '';
-	}
-
-	function formatFecha(fecha: any) {
-		if (fecha) {
-			const fechaObjeto = new Date(fecha);
-
-			return fechaObjeto.toISOString();
-		} else {
-			return '';
-		}
-	}
-
-	$: if (form) {
-
-		if (form?.returnDelete) {
-			toast.success(form.messageDelete);
-		}
-
-		if (form?.responseCreate) {
-			toast.success(form.messageCreate);
-		}
-
-		if (form?.responseEdit) {
-			toast.success(form.messageEdit);
-		}
 
 		if (form?.hours) {
 			let fechaI = new Date();
@@ -119,11 +78,13 @@
 				fechaI = new Date('2024-06-01T00:00:00.000Z');
 			} else {
 				fechaI = new Date(formatFecha(fechaInicio));
+				console.log(fechaI);
 			}
 			if (fechaFin == '') {
 				let fechaActual = new Date().toISOString();
 			} else {
 				fechaF = new Date(formatFecha(fechaFin));
+				console.log(fechaF);
 			}
 
 			if (fechaInicio == '' && fechaFin == '') {
@@ -144,25 +105,85 @@
 					}
 				}
 			} else {
-				const filteredHours = form.hours.filter((hour: any) => {
-					const createdAtDate = new Date(hour.created_at);
-					return createdAtDate >= fechaI && createdAtDate <= fechaF;
-				});
+				if (fechaInicio > fechaFin) {
+					toast.error('La fecha de inicio no puede ser mayor a la feha final');
+				} else {
+					ShowHoursReport = true;
+					const filteredHours = form.hours.filter((hour: any) => {
+						const createdAtDate = hour.date;
+						return createdAtDate >= fechaInicio && createdAtDate <= fechaFin;
+					});
 
-				const horas_lista = filteredHours.map((item: { hours: any }) => item.hours);
+					console.log(filteredHours);
 
-				// Calculamos la suma utilizando la función reduce()
-				totalHours = horas_lista?.reduce((acc: any, curr: any) => acc + curr, 0);
+					const horas_lista = filteredHours.map((item: { hours: any }) => item.hours);
 
-				totalTasks = 0;
-				for (const item of filteredHours) {
-					if (item.task) {
-						totalTasks++;
+					// Calculamos la suma utilizando la función reduce()
+					totalHours = horas_lista?.reduce((acc: any, curr: any) => acc + curr, 0);
+
+					totalTasks = 0;
+					for (const item of filteredHours) {
+						if (item.task) {
+							totalTasks++;
+						}
 					}
 				}
 			}
+		}
+	}
 
-			ShowHoursReport = true;
+	async function editTask(id: any) {
+		modalDeleteType = 'tarea';
+		idEdit = id;
+		openModalEditT = true;
+	}
+
+	async function editUser(id: any) {
+		modalDeleteType = 'usuario';
+		idEdit = id;
+		openModalEditU = true;
+	}
+
+	async function editUserClose(id: any) {
+		openModalEditU = false;
+	}
+
+	async function clearInput() {
+		ShowHoursReport = false;
+		selectedUser = '';
+		fechaInicio = '';
+		fechaFin = '';
+	}
+
+	function formatFecha(fecha: any) {
+		if (fecha) {
+			const fechaObjeto = new Date(fecha);
+
+			return fechaObjeto.toISOString();
+		} else {
+			return '';
+		}
+	}
+
+	$: if (form) {
+		if (form?.returnDelete) {
+			toast.success(form.messageDelete);
+		}
+
+		if (form?.responseCreate) {
+			toast.success(form.messageCreate);
+		}
+
+		if (form?.responseEdit) {
+			console.log(form?.responseEdit)
+			console.log(form?.messageEdit)
+			toast.success(form.messageEdit);
+		}
+
+		if (form?.responseEditUser) {
+			console.log(form?.responseEditUser)
+			console.log(form?.messageEditUser)
+			toast.success(form.messageEditUser);
 		}
 	}
 </script>
@@ -354,10 +375,7 @@
 				</button>
 				<button
 					type="button"
-					on:click={() => {
-						ShowHoursReport = false
-						clearInput()
-					}}
+					on:click|self={clearInput}
 					class="rounded-[20px] bg-[#ff461e] h-8 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300 mx-auto"
 				>
 					Limpiar
@@ -391,7 +409,7 @@
 <!-- Modal Usuario -->
 <Portal>
 	<ModalLarge bind:open={openModalUser}>
-		<form method="post" use:enhance={(e) => submitCreate(e)}>
+		<form method="post" use:enhance={() => submitCreate()}>
 			<div class="flex flex-col justify-center">
 				<p class="text-2xl text-white text-center font-bold leading-8 pt-6 pb-4">
 					Creacion de Usuario
@@ -405,6 +423,7 @@
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Nombre de usuario"
 					name="username"
+					required
 					bind:value={username}
 				/>
 				<p class="sm:text-lg text-white">Contraseña</p>
@@ -412,20 +431,28 @@
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Contraseña"
 					name="password"
+					required
 					bind:value={password}
 				/>
 				<p class="sm:text-lg text-white">Nombre y apellido</p>
 				<input
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Nombre y apellido"
+					type="text"
 					name="fullName"
+					pattern="[A-Za-z ]*"
+					required
 					bind:value={fullName}
 				/>
 				<p class="sm:text-lg text-white">Número de cedula</p>
 				<input
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Número de cedula"
+					type="number"
+					min="1000000"
+					max="9999999999"
 					name="C_I"
+					required
 					bind:value={C_I}
 				/>
 				<p class="sm:text-lg text-white">Fecha de nacimiento</p>
@@ -434,13 +461,17 @@
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Fecha de nacimiento"
 					name="bithdate"
+					required
 					bind:value={bithdate}
+					max={new Date().toISOString().split('T')[0]}
+					on:keydown={() => false}
 				/>
 				<p class="sm:text-lg text-white">Rol</p>
 				<select
 					class="inline sm:text-lg mr-auto w-full bg-stone-300 pl-3 rounded-md mt-1 mb-4"
 					placeholder="Rol del usuario"
 					name="rol"
+					required
 					bind:value={id_rol}
 				>
 					<option disabled selected hidden value="">Selecione un rol</option>
@@ -460,7 +491,7 @@
 					type="submit"
 					formaction="?/createUser"
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
-					on:click={submitCreate}
+					on:click={() => submitCreate}
 				>
 					Crear
 				</button>
@@ -472,7 +503,7 @@
 <!-- Modal de edit Usuario-->
 <Portal>
 	<ModalLarge bind:open={openModalEditU}>
-		<form method="post" use:enhance={editUser}>
+		<form method="post" use:enhance={editUserClose}>
 			<div class="flex flex-col justify-center">
 				<p class="text-2xl text-white text-center font-bold leading-8 pt-6 pb-4">Editar Usuario</p>
 			</div>
@@ -485,6 +516,7 @@
 					placeholder="Nombre de usuario"
 					name="username"
 					bind:value={data.Users[idEdit].username}
+					required
 				/>
 				<p class="sm:text-lg text-white">Contraseña</p>
 				<input
@@ -492,6 +524,7 @@
 					placeholder="Contraseña"
 					name="password"
 					bind:value={data.Users[idEdit].password}
+					required
 				/>
 				<p class="sm:text-lg text-white">Nombre y apellido</p>
 				<input
@@ -499,6 +532,7 @@
 					placeholder="Nombre y apellido"
 					name="fullName"
 					bind:value={data.Users[idEdit].fullName}
+					required
 				/>
 				<p class="sm:text-lg text-white">Número de cedula</p>
 				<input
@@ -506,6 +540,7 @@
 					placeholder="Número de cedula"
 					name="C_I"
 					bind:value={data.Users[idEdit].C_I}
+					required
 				/>
 				<p class="sm:text-lg text-white">Fecha de nacimiento</p>
 				<input
@@ -514,6 +549,9 @@
 					placeholder="Fecha de nacimiento"
 					name="bithdate"
 					bind:value={data.Users[idEdit].bithdate}
+					max={new Date().toISOString().split('T')[0]}
+					on:keydown={() => false}
+					required
 				/>
 				<!-- <p class="sm:text-lg text-white">Estado</p>
 				<select
@@ -531,6 +569,7 @@
 					placeholder="Rol del usuario"
 					name="rol"
 					bind:value={data.Users[idEdit].id_rol}
+					required
 				>
 					<option value={data.Users[idEdit].id_rol}></option>
 					<option value="1">Administrador</option>
@@ -549,10 +588,7 @@
 					type="submit"
 					formaction="?/updateUser"
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
-					on:click={(e) => {
-						editUser(e);
-						window.location.reload();
-					}}
+					on:click={(e) => {openModalEditU = false}}
 				>
 					Editar
 				</button>
@@ -564,7 +600,7 @@
 <!-- Modal Tarea -->
 <Portal>
 	<ModalLarge bind:open={openModalTarea}>
-		<form method="post" use:enhance={(e) => submitCreate(e)}>
+		<form method="post" use:enhance={() => submitCreate()}>
 			<div class="flex flex-col justify-center">
 				<p class="text-2xl text-white text-center font-bold leading-8 pt-6 pb-4">Crear Tarea</p>
 			</div>
@@ -576,6 +612,7 @@
 					class="inline sm:text-lg mr-auto mb-4 mt-1 w-full bg-stone-300 pl-3 rounded-md"
 					placeholder="Nombre del usuario"
 					name="taskName"
+					required
 					bind:value={taskName}
 				/>
 
@@ -584,6 +621,7 @@
 					class="inline sm:text-lg mr-auto mb-4 mt-1 w-full bg-stone-300 pl-3 rounded-md"
 					placeholder="Descripción"
 					name="taskDescription"
+					required
 					bind:value={taskDescription}
 				/>
 			</div>
@@ -602,7 +640,6 @@
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
 					on:click={() => {
 						submitCreate;
-						
 					}}
 				>
 					Crear
@@ -615,7 +652,7 @@
 <!-- Modal edit Tarea -->
 <Portal>
 	<ModalLarge bind:open={openModalEditT}>
-		<form method="post" use:enhance={(e) => submitCreate(e)}>
+		<form method="post" use:enhance={() => submitCreate()}>
 			<div class="flex flex-col justify-center">
 				<p class="text-2xl text-white text-center font-bold leading-8 pt-6 pb-4">Editar Tarea</p>
 			</div>
@@ -651,7 +688,9 @@
 					type="submit"
 					formaction="?/updateTask"
 					class="rounded-[20px] bg-[#ff461e] h-12 text-white text-lg font-medium pl-6 pr-6 hover:bg-[#f44848] duration-300"
-					on:click={() => {openModalEditT = false}}
+					on:click={() => {
+						openModalEditT = false;
+					}}
 				>
 					Editar
 				</button>

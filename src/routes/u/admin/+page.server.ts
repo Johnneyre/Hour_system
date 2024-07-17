@@ -113,6 +113,7 @@ export const actions: Actions = {
 		const data = await request.formData()
 
 		try {
+			console.log('funciona')
 			const UserId = Number(data.get('UserId'))
 			const username = data.get('username')
 			const password = data.get('password')
@@ -133,7 +134,7 @@ export const actions: Actions = {
 			}
 
 			const responseEdit = await fastAxios.put(`/users/${UserId}`, updateUser);
-			return { responseEdit: responseEdit.status, messageEdit: 'El usuario se a actualizado exitosamente'}
+			return { responseEditUser: responseEdit.status, messageEditUser: 'El usuario se a actualizado exitosamente'}
 		} catch (error) {
 			console.log(error)
 		}
